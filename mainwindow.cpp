@@ -10,6 +10,7 @@
 #include "commandteacheradd.h"
 #include "commandteacherdelete.h"
 #include "commandteacheredit.h"
+#include "horizontalheaderview.h"
 #include "maintablewidget.h"
 
 
@@ -59,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect( this->m_pTableWidget, SIGNAL(classMoved(QTableWidgetItem*,int,int,int,int)),\
              this, SLOT(moveClass(QTableWidgetItem*,int,int,int,int)) );
 
-    //connect( this->m_pTableWidget->horizontalHeader(), SIGNAL(sectionMoved(int,int,int))
+    connect( this->m_pTableWidget->getHHeaderView(), SIGNAL(teacherMoved(int,int)), this, SLOT(moveTeacher(int,int)));
 
     this->m_undoStack = new QUndoStack(this);
     this->m_undoView = 0;
@@ -247,7 +248,7 @@ void MainWindow::cellDoubleClicked(int nRow, int nCol)
 void MainWindow::headerSelected(int index)
 {
     int visualIndex = this->m_pTableWidget->horizontalHeader()->visualIndex(index);
-    if(visualIndex == this->m_pTableWidget->columnCount() - 1)
+    if(visualIndex == 0)
     {
         NewTeacherDialog *newTeach = new NewTeacherDialog;
         connect( newTeach, SIGNAL(newTeacherInput(QTextEdit*)), this, \
@@ -274,6 +275,11 @@ void MainWindow::createNewTeachers(QTextEdit *inText)
 void MainWindow::editTeacher(QString headerAfter, int column)
 {
     this->m_undoStack->push( new CommandTeacherEdit(column, headerAfter, this->m_pTableWidget, &this->m_HTableHeader));
+}
+
+void MainWindow::moveTeacher(int, int)
+{
+
 }
 
 void MainWindow::setClass(QString name, QString grade, \

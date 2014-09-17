@@ -5,6 +5,7 @@
 
 class QUndoStack;
 class QModelIndex;
+class HorizontalHeaderView;
 
 class MainTableWidget : public QTableWidget
 {
@@ -38,6 +39,8 @@ public:
     void decreaseCopiedItemNumber() { copiedItemNumber--; }
     void resetCopiedItemNumber(int number = 0) { number++; copiedItemNumber = number; }
 
+    HorizontalHeaderView *getHHeaderView() const;
+
 signals:
     void classMoved(QTableWidgetItem*, \
                     int toRow, int toCol, int fromRow, int fromCol);
@@ -54,6 +57,8 @@ private:
 
     QStringList m_HTableHeader;
     QStringList m_VTableHeader;
+
+    HorizontalHeaderView *hHeaderView;
 
 };
 

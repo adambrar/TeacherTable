@@ -1,5 +1,6 @@
 #include "maintablewidget.h"
 #include "commandclassmove.h"
+#include "horizontalheaderview.h"
 
 #include <QTableWidget>
 #include <QMouseEvent>
@@ -17,11 +18,16 @@ MainTableWidget::MainTableWidget(QWidget *parent) :
     setSelectionMode(QAbstractItemView::SingleSelection);
     setSelectionBehavior(QAbstractItemView::SelectItems);
     this->copiedItemNumber = 0;
+
+    this->hHeaderView = new HorizontalHeaderView(this);
+    this->setHorizontalHeader( hHeaderView );
 }
 
 void MainTableWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    if(event->pos().x() >= this->columnWidth(0)*this->columnCount()-1)
+    QTableWidgetItem *item = this->itemAt(event->pos());
+
+    if(this->visualColumn(item->column()) == 0)
         return;
 
     this->movingItem = new QTableWidgetItem( *itemAt( event->pos() ));
@@ -33,8 +39,9 @@ void MainTableWidget::mouseMoveEvent(QMouseEvent *event)
 void MainTableWidget::dropEvent(QDropEvent *event)
 {
     QModelIndex toIndex = indexAt(event->pos());
+    QTableWidgetItem *item = this->itemAt(event->pos());
 
-    if(event->pos().x() >= this->columnWidth(0)*this->columnCount()-1)
+    if(this->visualColumn(item->column()) == 0)
         return;
 
     emit classMoved(movingItem, toIndex.row(), toIndex.column(), \
@@ -156,6 +163,10 @@ QTableWidgetItem *MainTableWidget::getCopiedItem() const
 void MainTableWidget::setCopiedItem(QTableWidgetItem *value)
 {
     copiedItem = new QTableWidgetItem(*value);
+}
+HorizontalHeaderView *MainTableWidget::getHHeaderView() const
+{
+    return hHeaderView;
 }
 
 QTableWidgetItem* MainTableWidget::emptyCell() const

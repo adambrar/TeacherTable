@@ -43,6 +43,7 @@ private slots:
 
     void createNewTeachers(QTextEdit*);
     void editTeacher(QString, int);
+    void moveTeacher(int, int);
 
     void createNewTable();
     void cellContextMenu(QPoint);
