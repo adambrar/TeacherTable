@@ -71,8 +71,5 @@ void CommandTeacherAdd::redo()
                     setBackgroundColor(QColor(255,255,255) );
         }
 
-        m_tableWidget->horizontalHeader()->swapSections( \
-                   m_tableWidget->columnCount() - 2, \
-                   m_tableWidget->columnCount() - 1 );
     }
 }

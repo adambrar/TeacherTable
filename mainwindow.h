@@ -63,8 +63,6 @@ private:
 
     QStringList m_HTableHeader;
     QStringList m_VTableHeader;
-
-    int *visibleColumns;
 };
 
 #endif // MAINWINDOW_H

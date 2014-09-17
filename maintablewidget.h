@@ -31,8 +31,6 @@ public:
     QStringList VTableHeader() const;
     void setVTableHeader(const QStringList &VTableHeader);
 
-    int visibleColumns;
-
     QTableWidgetItem *getCopiedItem() const;
     void setCopiedItem(QTableWidgetItem *value);
     int getCopiedItemNumber() { return copiedItemNumber; }

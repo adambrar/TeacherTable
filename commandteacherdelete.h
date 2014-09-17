@@ -10,7 +10,7 @@ class QTableWidget;
 class CommandTeacherDelete : public QUndoCommand
 {
 public:
-    explicit CommandTeacherDelete(QTableWidget*, QStringList*, int*, int, QObject *parent = 0);
+    explicit CommandTeacherDelete(QTableWidget*, QStringList*, int, QObject *parent = 0);
 
     ~CommandTeacherDelete();
 
@@ -27,7 +27,6 @@ private:
     QStringList *m_hTableHeader;
 
     int clickedColumn;
-    int *visibleColumns;
 };
 
 #endif // COMMANDTEACHERDELETE_H

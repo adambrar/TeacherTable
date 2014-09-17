@@ -59,14 +59,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect( this->m_pTableWidget, SIGNAL(classMoved(QTableWidgetItem*,int,int,int,int)),\
              this, SLOT(moveClass(QTableWidgetItem*,int,int,int,int)) );
 
+    //connect( this->m_pTableWidget->horizontalHeader(), SIGNAL(sectionMoved(int,int,int))
+
     this->m_undoStack = new QUndoStack(this);
     this->m_undoView = 0;
     createMenu();
 
     this->m_pTableWidget->setCopiedItem( new QTableWidgetItem(QString(" \n \n ")) );
     this->m_pTableWidget->setFocus();
-
-    this->visibleColumns = &(this->m_pTableWidget->visibleColumns);
 }
 
 MainWindow::~MainWindow()
@@ -183,7 +183,7 @@ void MainWindow::cellContextMenu(QPoint point)
 
 void MainWindow::headerContextMenu(QPoint point)
 {
-    if( point.x() > ( this->m_pTableWidget->columnWidth(0)*(*this->visibleColumns) ) )\
+    if( point.x() > ( this->m_pTableWidget->columnWidth(0)*(this->m_pTableWidget->columnCount()-1) ) )\
     {
         return;
     }
@@ -211,10 +211,10 @@ void MainWindow::headerContextMenu(QPoint point)
 
 
     } else if ( clickedAction == deleteAction ) {
-        m_undoStack->push( new CommandTeacherDelete(this->m_pTableWidget, &this->m_HTableHeader, \
-                                                    this->visibleColumns, clickedColumn) );
+        this->m_undoStack->clear();
+        this->m_pTableWidget->removeColumn(clickedColumn);
+        this->m_HTableHeader.removeAt(clickedColumn);
     }
-
 }
 
 void MainWindow::cellDoubleClicked(int nRow, int nCol)
@@ -268,29 +268,12 @@ void MainWindow::createNewTeachers(QTextEdit *inText)
 
     QStringList teacherNames = input.split( "," );
 
-    (*this->visibleColumns) += teacherNames.size();
-
     this->m_undoStack->push( new CommandTeacherAdd(&teacherNames, &this->m_HTableHeader, this->m_pTableWidget) );
 }
 
 void MainWindow::editTeacher(QString headerAfter, int column)
 {
     this->m_undoStack->push( new CommandTeacherEdit(column, headerAfter, this->m_pTableWidget, &this->m_HTableHeader));
-}
-
-void MainWindow::createNewTable()
-{
-    this->m_pTableWidget->setColumnCount(1);
-    this->m_pTableWidget->HTableHeader().clear();
-    this->m_pTableWidget->HTableHeader()<<"A\nd\nd\n \nT\ne\na\nc\nh\ne\nr";
-
-    this->m_pTableWidget->insertInstructions(this->m_pTableWidget);
-
-    this->m_HTableHeader.clear();
-    this->m_HTableHeader = this->m_pTableWidget->HTableHeader();
-    this->m_pTableWidget->setHorizontalHeaderLabels(this->m_HTableHeader);
-
-    this->m_undoStack->clear();
 }
 
 void MainWindow::setClass(QString name, QString grade, \
@@ -372,6 +355,21 @@ void MainWindow::pasteClass()
                                                        this->m_pTableWidget) );
 }
 
+void MainWindow::createNewTable()
+{
+    this->m_pTableWidget->setColumnCount(1);
+    this->m_pTableWidget->HTableHeader().clear();
+    this->m_pTableWidget->HTableHeader()<<"A\nd\nd\n \nT\ne\na\nc\nh\ne\nr";
+
+    this->m_pTableWidget->insertInstructions(this->m_pTableWidget);
+
+    this->m_HTableHeader.clear();
+    this->m_HTableHeader = this->m_pTableWidget->HTableHeader();
+    this->m_pTableWidget->setHorizontalHeaderLabels(this->m_HTableHeader);
+
+    this->m_undoStack->clear();
+}
+
 QSize MainWindow::getWindowSize()
 {
     return this->m_pTableWidget->getTableSize(this->m_pTableWidget);
@@ -402,8 +400,7 @@ void MainWindow::saveToFile()
         //table size
         qint32 numRows = this->m_pTableWidget->rowCount();
         qint32 numCols = this->m_pTableWidget->columnCount();
-        qint32 visibleColStore = *this->visibleColumns;
-        out << numRows << numCols << visibleColStore;
+        out << numRows << numCols;
 
         out << this->m_HTableHeader << this->m_VTableHeader;
 
@@ -444,10 +441,8 @@ void MainWindow::loadFromFile()
 
         createNewTable();
 
-        qint32 numRows, numCols, numVisibleCols;
-        in >> numRows >> numCols >> numVisibleCols;
-
-        *this->visibleColumns = numVisibleCols;
+        qint32 numRows, numCols;
+        in >> numRows >> numCols;
 
         this->m_pTableWidget->setRowCount(numRows);
         this->m_pTableWidget->setColumnCount(numCols);

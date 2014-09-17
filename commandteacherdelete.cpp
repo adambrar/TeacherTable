@@ -3,12 +3,11 @@
 #include <QStringList>
 
 CommandTeacherDelete::CommandTeacherDelete(QTableWidget *tableWidget, QStringList *tableHeader, \
-                                           int *visibleColumnsStore, int column, QObject*)
+                                           int column, QObject*)
 {
     this->m_tableWidget = tableWidget;
     this->m_hTableHeader = tableHeader;
     this->clickedColumn = column;
-    this->visibleColumns = visibleColumnsStore;
 
     QString header = m_tableWidget->takeHorizontalHeaderItem(clickedColumn)-> text();
     header.remove("\n");
@@ -26,11 +25,9 @@ void CommandTeacherDelete::undo()
 {
     this->m_tableWidget->showColumn(clickedColumn);
     this->m_tableWidget->setHorizontalHeaderLabels(*this->m_hTableHeader);
-    (*visibleColumns)++;
 }
 
 void CommandTeacherDelete::redo()
 {
     this->m_tableWidget->hideColumn(clickedColumn);
-    (*visibleColumns)--;
 }

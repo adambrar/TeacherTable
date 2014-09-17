@@ -48,7 +48,7 @@ NewClassDialog::NewClassDialog(int row, int column, QString name, \
 
     setLayout(formLayout);
 
-    addClassButton->setFocus();
+    classNameInput->setFocus();
 
     connect( addClassButton, SIGNAL(clicked()), this, SLOT(getInput()) );
     connect( cancelButton, SIGNAL(clicked()), this, SLOT(cancelAdd()) );

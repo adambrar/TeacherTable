@@ -16,13 +16,12 @@ MainTableWidget::MainTableWidget(QWidget *parent) :
     setDragDropMode(QAbstractItemView::InternalMove);
     setSelectionMode(QAbstractItemView::SingleSelection);
     setSelectionBehavior(QAbstractItemView::SelectItems);
-    this->visibleColumns = 0;
     this->copiedItemNumber = 0;
 }
 
 void MainTableWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    if(event->pos().x() >= this->columnWidth(0)*this->visibleColumns)
+    if(event->pos().x() >= this->columnWidth(0)*this->columnCount()-1)
         return;
 
     this->movingItem = new QTableWidgetItem( *itemAt( event->pos() ));
@@ -35,7 +34,7 @@ void MainTableWidget::dropEvent(QDropEvent *event)
 {
     QModelIndex toIndex = indexAt(event->pos());
 
-    if(event->pos().x() >= this->columnWidth(0)*this->visibleColumns)
+    if(event->pos().x() >= this->columnWidth(0)*this->columnCount()-1)
         return;
 
     emit classMoved(movingItem, toIndex.row(), toIndex.column(), \

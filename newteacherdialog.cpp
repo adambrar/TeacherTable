@@ -29,7 +29,7 @@ NewTeacherDialog::NewTeacherDialog(QWidget *parent) :
     f_layout->addRow( buttonsLayout );
 
     setLayout(f_layout);
-    addTeacherButton->setFocus();
+    inText->setFocus();
 
     connect( addTeacherButton, SIGNAL(clicked()), this, SLOT(getInput()) );
     connect( addFileButton, SIGNAL(clicked()), this, SLOT(addFile()) );
