@@ -78,6 +78,7 @@ void MainTableWidget::initTableWidget( QTableWidget *m_pTableWidget )
     m_pTableWidget->horizontalHeader()->setSelectionBehavior(QAbstractItemView::SelectColumns);
 
     m_pTableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    m_pTableWidget->verticalHeader()->setSectionsClickable(true);
 
     m_pTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_pTableWidget->setSelectionBehavior(QAbstractItemView::SelectColumns);
@@ -98,6 +99,8 @@ void MainTableWidget::initTableWidget( QTableWidget *m_pTableWidget )
 void MainTableWidget::insertInstructions( QTableWidget *m_pTableWidget )
 {
     //insert data
+    int lastCol = m_pTableWidget->columnCount() - 1;
+
     for (int row = 0; row < m_pTableWidget->rowCount(); row++)
     {
         QTableWidgetItem *newItem = new QTableWidgetItem \
@@ -105,23 +108,22 @@ void MainTableWidget::insertInstructions( QTableWidget *m_pTableWidget )
         newItem->setTextAlignment(Qt::AlignCenter);
 
         newItem->setFlags(newItem->flags() & ~Qt::ItemIsEnabled & ~Qt::ItemIsDropEnabled);
-        m_pTableWidget->setItem(row, 0, newItem);
+        m_pTableWidget->setItem(row, lastCol, newItem);
 
         m_pTableWidget->resizeRowToContents(row);
     }
 
-    int lastRow = m_pTableWidget->columnCount() - 1;
 
-    m_pTableWidget->item(0,lastRow)->setText("Double\nclick\ncells");
-    m_pTableWidget->item(1,lastRow)->setText("to\ncreate\nnew");
-    m_pTableWidget->item(2,lastRow)->setText("classes.\n \nClick");
-    m_pTableWidget->item(3,lastRow)->setText("New\nTeacher\nto");
-    m_pTableWidget->item(4,lastRow)->setText("add\nteachers.\n ");
-    m_pTableWidget->item(5,lastRow)->setText("Drag\nand\nDrop");
-    m_pTableWidget->item(6,lastRow)->setText("wwwwwww");
+    m_pTableWidget->item(0,lastCol)->setText("Double\nclick\ncells");
+    m_pTableWidget->item(1,lastCol)->setText("to\ncreate\nnew");
+    m_pTableWidget->item(2,lastCol)->setText("classes.\n \nClick");
+    m_pTableWidget->item(3,lastCol)->setText("New\nTeacher\nto");
+    m_pTableWidget->item(4,lastCol)->setText("add\nteachers.\n ");
+    m_pTableWidget->item(5,lastCol)->setText("Drag\nand\nDrop");
+    m_pTableWidget->item(6,lastCol)->setText("wwwwwww");
 
-    m_pTableWidget->resizeColumnToContents(lastRow);
-    m_pTableWidget->item(6,lastRow)->setText("cells\nto\nreorder");
+    m_pTableWidget->resizeColumnToContents(lastCol);
+    m_pTableWidget->item(6,lastCol)->setText("cells\nto\nreorder");
 
 }
 
