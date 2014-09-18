@@ -14,6 +14,10 @@ HorizontalHeaderView::HorizontalHeaderView(MainTableWidget* m_pTableWidget, QWid
     this->pressedLogicalIndex = this->pressedVisualIndex = 0;
 }
 
+HorizontalHeaderView::~HorizontalHeaderView()
+{
+}
+
 void HorizontalHeaderView::mousePressEvent(QMouseEvent *event)
 {
     this->pressedPoint = event->pos();

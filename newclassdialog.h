@@ -16,12 +16,13 @@ class NewClassDialog : public QDialog
 public:
     explicit NewClassDialog(int, int, QString name = "", QString grade = "", \
                             QString section = "", QString notes = "", QWidget *parent = 0);
+    ~NewClassDialog();
 
     int getRow() { return nRow; }
     int getColumn() { return nColumn; }
     void showDialog();
-    QString getGradeString();
-    QTableWidgetItem* createClass(QString, QString, QString, QString);
+    QString getGradeString(QString *);
+    QTableWidgetItem* createClass(QString, QString, QString, QString, QString);
 
 
 signals:

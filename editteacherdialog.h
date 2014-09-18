@@ -10,6 +10,8 @@ class EditTeacherDialog : public QDialog
     Q_OBJECT
 public:
     explicit EditTeacherDialog(QString currentName, int column, QWidget *parent = 0);
+    ~EditTeacherDialog();
+
     void showDialog();
 
 signals:

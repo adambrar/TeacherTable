@@ -27,7 +27,8 @@ SOURCES += main.cpp\
     newclassdialog.cpp \
     newteacherdialog.cpp \
     horizontalheaderview.cpp \
-    commandteachermove.cpp
+    commandteachermove.cpp \
+    rowgradesdialog.cpp
 
 HEADERS  += \
     commandclassadd.h \
@@ -44,4 +45,5 @@ HEADERS  += \
     newclassdialog.h \
     newteacherdialog.h \
     horizontalheaderview.h \
-    commandteachermove.h
+    commandteachermove.h \
+    rowgradesdialog.h

@@ -12,7 +12,7 @@ NewTeacherDialog::NewTeacherDialog(QWidget *parent) :
     QDialog(parent)
 {
     QFormLayout *f_layout = new QFormLayout;
-    inText = new QTextEdit;
+    this->inText = new QTextEdit;
     f_layout->addRow( new QLabel( QString("Enter the names " \
                                           "of teachers to add.\nEnter " \
                                           "each teacher separated by a comma." \
@@ -34,6 +34,11 @@ NewTeacherDialog::NewTeacherDialog(QWidget *parent) :
     connect( addTeacherButton, SIGNAL(clicked()), this, SLOT(getInput()) );
     connect( addFileButton, SIGNAL(clicked()), this, SLOT(addFile()) );
     connect( cancelButton, SIGNAL(clicked()), this, SLOT(cancelAdd()) );
+}
+
+NewTeacherDialog::~NewTeacherDialog()
+{
+    delete this->inText;
 }
 
 void NewTeacherDialog::getInput()

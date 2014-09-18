@@ -12,6 +12,7 @@ class MainTableWidget : public QTableWidget
     Q_OBJECT
 public:
     explicit MainTableWidget(QWidget *parent = 0);
+    ~MainTableWidget();
 
     void dropEvent(QDropEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
@@ -38,6 +39,8 @@ public:
     void increaseCopiedItemNumber() { copiedItemNumber++; }
     void decreaseCopiedItemNumber() { copiedItemNumber--; }
     void resetCopiedItemNumber(int number = 0) { number++; copiedItemNumber = number; }
+
+    int BlackoutColumns() const { return blackoutColumns; }
 
     HorizontalHeaderView *getHHeaderView() const;
 

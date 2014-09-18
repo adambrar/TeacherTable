@@ -24,6 +24,11 @@ MainTableWidget::MainTableWidget(QWidget *parent) :
     this->blackoutColumns = 1;
 }
 
+MainTableWidget::~MainTableWidget()
+{
+    delete this->hHeaderView;
+}
+
 void MainTableWidget::mouseMoveEvent(QMouseEvent *event)
 {
     QTableWidgetItem *item = this->itemAt(event->pos());
@@ -167,6 +172,7 @@ void MainTableWidget::setCopiedItem(QTableWidgetItem *value)
 {
     copiedItem = new QTableWidgetItem(*value);
 }
+
 HorizontalHeaderView *MainTableWidget::getHHeaderView() const
 {
     return hHeaderView;

@@ -11,6 +11,8 @@ class NewTeacherDialog : public QDialog
 
 public:
     NewTeacherDialog( QWidget *parent = 0 );
+    ~NewTeacherDialog();
+
     void showDialog();
 
 signals:

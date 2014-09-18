@@ -35,6 +35,11 @@ EditTeacherDialog::EditTeacherDialog(QString teacherName, int clickedColumn, QWi
 
 }
 
+EditTeacherDialog::~EditTeacherDialog()
+{
+    delete this->teacherNameInput;
+}
+
 void EditTeacherDialog::getName()
 {
     emit editTeacherInput(this->teacherNameInput->text().toUpper(), column);

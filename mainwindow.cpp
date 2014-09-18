@@ -13,6 +13,7 @@
 #include "commandteachermove.h"
 #include "horizontalheaderview.h"
 #include "maintablewidget.h"
+#include "rowgradesdialog.h"
 
 
 #include <QApplication>
@@ -48,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
              this, SLOT( cellDoubleClicked( int, int ) ) );
 
     connect( this->m_pTableWidget->horizontalHeader(), SIGNAL(sectionClicked(int)),
-             this, SLOT(headerSelected(int)) );
+             this, SLOT(hHeaderSelected(int)) );
 
     connect( this->m_pTableWidget, SIGNAL(customContextMenuRequested(QPoint)), \
              this, SLOT(cellContextMenu(QPoint)) );
@@ -59,7 +60,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect( this->m_pTableWidget, SIGNAL(classMoved(QTableWidgetItem*,int,int,int,int)),\
              this, SLOT(moveClass(QTableWidgetItem*,int,int,int,int)) );
 
-    connect( this->m_pTableWidget->getHHeaderView(), SIGNAL(teacherMoved(int,int)), this, SLOT(moveTeacher(int,int)));
+    connect( this->m_pTableWidget->getHHeaderView(), SIGNAL(teacherMoved(int,int)), this, SLOT(moveTeacher(int,int)) );
+
+    connect( this->m_pTableWidget->verticalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(vHeaderSelected(int)) );
 
     this->m_undoStack = new QUndoStack(this);
     this->m_undoView = 0;
@@ -249,9 +252,9 @@ void MainWindow::cellDoubleClicked(int nRow, int nCol)
     newClass->showDialog();
 }
 
-void MainWindow::headerSelected(int index)
+void MainWindow::hHeaderSelected(int column)
 {
-    int visualIndex = this->m_pTableWidget->horizontalHeader()->visualIndex(index);
+    int visualIndex = this->m_pTableWidget->horizontalHeader()->visualIndex(column);
     if(visualIndex == 0)
     {
         NewTeacherDialog *newTeach = new NewTeacherDialog;
@@ -265,6 +268,16 @@ void MainWindow::headerSelected(int index)
 
         newTeach->showDialog();
     }
+}
+
+void MainWindow::vHeaderSelected(int row)
+{
+    RowGradesDialog *rowGrades = new RowGradesDialog(this->m_pTableWidget, row);
+    rowGrades->setWindowTitle("Grade Totals");
+    rowGrades->move(this->geometry().center().x()-rowGrades->geometry().width()/2, \
+                   this->geometry().center().y()-rowGrades->geometry().height()/2 + \
+                    this->m_pTableWidget->rowHeight(0)*row);
+    rowGrades->showDialog();
 }
 
 void MainWindow::createNewTeachers(QTextEdit *inText)

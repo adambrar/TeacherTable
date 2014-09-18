@@ -30,7 +30,8 @@ public:
     QSize getWindowSize();
 
 private slots:
-    void headerSelected(int);
+    void hHeaderSelected(int);
+    void vHeaderSelected(int);
     void cellDoubleClicked(int, int);
 
     void setClass(QTableWidgetItem*, int, int);

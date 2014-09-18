@@ -10,6 +10,7 @@ class HorizontalHeaderView : public QHeaderView
     Q_OBJECT
 public:
     explicit HorizontalHeaderView(MainTableWidget*, QWidget *parent = 0);
+    ~HorizontalHeaderView();
 
     void mousePressEvent( QMouseEvent* );
     void mouseReleaseEvent( QMouseEvent* );
