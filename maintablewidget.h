@@ -59,7 +59,7 @@ private:
     QStringList m_VTableHeader;
 
     HorizontalHeaderView *hHeaderView;
-
+    int blackoutColumns;
 };
 
 #endif // MAINTABLEWIDGET_H

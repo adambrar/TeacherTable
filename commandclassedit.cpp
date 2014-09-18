@@ -6,17 +6,17 @@
 CommandClassEdit::CommandClassEdit(int nRow, int nCol, QTableWidgetItem *toClass, \
                                    QTableWidget *nTableWidget, QObject*)
 {
-    row = nRow;
-    col = nCol;
-    m_toClass = new QTableWidgetItem(*toClass);
+    this->row = nRow;
+    this->col = nCol;
+    this->m_toClass = toClass->clone();
 
-    m_tableWidget = nTableWidget;
+    this->m_tableWidget = nTableWidget;
 
     if(nTableWidget->item(nRow, nCol) == 0)
     {
-        m_fromClass = new QTableWidgetItem(" \n \n ");
+        this->m_fromClass = new QTableWidgetItem(" \n \n ");
     } else {
-        m_fromClass = new QTableWidgetItem( *(nTableWidget->item(nRow, nCol)) );
+        this->m_fromClass = new QTableWidgetItem( *(nTableWidget->item(nRow, nCol)) );
     }
     setText( QString("Class edit at %1, %2").arg(nRow).arg(nCol) );
 }

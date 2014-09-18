@@ -8,7 +8,7 @@ CommandClassAdd::CommandClassAdd(int nRow, int nCol, QTableWidgetItem *nClass, \
                                  QTableWidget *nTableWidget, QObject*)
 {
     this->m_tableWidget = nTableWidget;
-    this->m_toClass = new QTableWidgetItem(*nClass);
+    this->m_toClass = nClass->clone();
     this->row = nRow;
     this->col = nCol;
 
@@ -20,7 +20,7 @@ CommandClassAdd::CommandClassAdd(int nRow, int nCol, QTableWidgetItem *nClass, \
         this->m_fromClass = new QTableWidgetItem( *(nTableWidget->item(nRow, nCol)) );
     }
 
-    setText( QString("Class added at %1, %2").arg(nCol).arg(nRow));
+    setText( QString("Class added at %1, %2").arg(nRow).arg(nCol));
 }
 
 CommandClassAdd::~CommandClassAdd()

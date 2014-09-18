@@ -7,6 +7,7 @@ class QLineEdit;
 class QHBoxLayout;
 class QCheckBox;
 class QTextEdit;
+class QTableWidgetItem;
 
 class NewClassDialog : public QDialog
 {
@@ -19,10 +20,12 @@ public:
     int getRow() { return nRow; }
     int getColumn() { return nColumn; }
     void showDialog();
+    QString getGradeString();
+    QTableWidgetItem* createClass(QString, QString, QString, QString);
 
 
 signals:
-    void newClassInput( QString, QString, QString, QString, int, int );
+    void newClassInput( QTableWidgetItem*, int, int );
     
 public slots:
     void getInput();

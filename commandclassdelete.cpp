@@ -12,7 +12,7 @@ CommandClassDelete::CommandClassDelete(int nRow, int nColumn, QTableWidgetItem *
     this->m_class = new QTableWidgetItem(*nClass);
     this->m_tableWidget = nTableWidget;
 
-    setText( QString("Class deleted at %1, %2").arg(nColumn).arg(nRow));
+    setText( QString("Class deleted at %1, %2").arg(nRow).arg(nColumn));
 }
 
 CommandClassDelete::~CommandClassDelete()

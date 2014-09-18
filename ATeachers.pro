@@ -26,8 +26,8 @@ SOURCES += main.cpp\
     mainwindow.cpp \
     newclassdialog.cpp \
     newteacherdialog.cpp \
-    optionsedit.cpp \
-    horizontalheaderview.cpp
+    horizontalheaderview.cpp \
+    commandteachermove.cpp
 
 HEADERS  += \
     commandclassadd.h \
@@ -43,5 +43,5 @@ HEADERS  += \
     mainwindow.h \
     newclassdialog.h \
     newteacherdialog.h \
-    optionsedit.h \
-    horizontalheaderview.h
+    horizontalheaderview.h \
+    commandteachermove.h

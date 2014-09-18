@@ -10,6 +10,7 @@
 #include "commandteacheradd.h"
 #include "commandteacherdelete.h"
 #include "commandteacheredit.h"
+#include "commandteachermove.h"
 #include "horizontalheaderview.h"
 #include "maintablewidget.h"
 
@@ -48,8 +49,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect( this->m_pTableWidget->horizontalHeader(), SIGNAL(sectionClicked(int)),
              this, SLOT(headerSelected(int)) );
-
-   // connect( this->m_pTableWidget->horizontalHeader(), SIGNAL(sectionMoved(int,int,int)), this
 
     connect( this->m_pTableWidget, SIGNAL(customContextMenuRequested(QPoint)), \
              this, SLOT(cellContextMenu(QPoint)) );
@@ -226,6 +225,10 @@ void MainWindow::cellDoubleClicked(int nRow, int nCol)
     if(clickedItem->text() == " \n \n ")
     {
         newClass = new NewClassDialog(nRow, nCol);
+        newClass->setWindowTitle("Add A Class");
+        connect( newClass, SIGNAL(newClassInput(QTableWidgetItem*, int, int)), \
+                 this, SLOT(setClass(QTableWidgetItem*, int, int)) );
+
     } else {
         QList<QVariant> data = clickedItem->data(Qt::UserRole).toList();
         newClass = new NewClassDialog(clickedItem->row(), \
@@ -234,14 +237,15 @@ void MainWindow::cellDoubleClicked(int nRow, int nCol)
                                        data.at(1).toString(), \
                                        data.at(2).toString(), \
                                        data.at(3).toString());
+        newClass->setWindowTitle("Edit A Class");
+        connect( newClass, SIGNAL(newClassInput(QTableWidgetItem*, int, int)), \
+                 this, SLOT(editClass(QTableWidgetItem*, int, int)) );
 
     }
 
-    connect( newClass, SIGNAL(newClassInput(QString,QString,QString,QString, int, int)), \
-             this, SLOT(setClass(QString,QString,QString,QString, int, int)) );
 
-    newClass->setWindowTitle("Add A Class");
-    newClass->move(geometry().center().x()-newClass->geometry().width()/2, geometry().center().y()-newClass->geometry().height()/2);
+    newClass->move(this->geometry().center().x()-newClass->geometry().width()/2, \
+                   this->geometry().center().y()-newClass->geometry().height()/2);
     newClass->showDialog();
 }
 
@@ -256,7 +260,8 @@ void MainWindow::headerSelected(int index)
 
 
         newTeach->setWindowTitle("Add teachers");
-        newTeach->move(geometry().center().x()-newTeach->geometry().width()/2, geometry().center().y()-newTeach->geometry().height()/2);
+        newTeach->move(geometry().center().x()-newTeach->geometry().width()/2, \
+                       geometry().center().y()-newTeach->geometry().height()/2);
 
         newTeach->showDialog();
     }
@@ -277,28 +282,14 @@ void MainWindow::editTeacher(QString headerAfter, int column)
     this->m_undoStack->push( new CommandTeacherEdit(column, headerAfter, this->m_pTableWidget, &this->m_HTableHeader));
 }
 
-void MainWindow::moveTeacher(int, int)
+void MainWindow::moveTeacher(int fromIndex, int toIndex)
 {
-
+    this->m_undoStack->push( new CommandTeacherMove(this->m_pTableWidget, fromIndex, toIndex));
 }
 
-void MainWindow::setClass(QString name, QString grade, \
-                          QString section, QString notes, int nRow, int nColumn)
+void MainWindow::setClass(QTableWidgetItem *item, int nRow, int nColumn)
 {
-    QList<QVariant> *newData = new QList<QVariant>;
-    newData->append(QVariant(name));
-    newData->append(QVariant(grade));
-    newData->append(QVariant(section));
-    newData->append(QVariant(notes));
-    newData->append(QVariant(nRow));
-    newData->append(QVariant(nColumn));
-
-    QVariant *dataToAdd = new QVariant(*newData);
-
-    QTableWidgetItem *newItem = new QTableWidgetItem( QString("%1\n%2\n00%3").arg(name).arg(grade).arg(section) );
-    newItem->setTextAlignment(Qt::AlignCenter);
-    newItem->setData(Qt::UserRole, *dataToAdd);
-
+    QTableWidgetItem *newItem = new QTableWidgetItem(*item);
     this->m_undoStack->push( new CommandClassAdd(nRow, nColumn, newItem, m_pTableWidget) );
 }
 
@@ -325,23 +316,9 @@ void MainWindow::moveClass(QTableWidgetItem *movedItem, \
 
 }
 
-void MainWindow::editClass(QString name, QString grade, \
-                           QString section, QString notes, int nRow, int nColumn)
+void MainWindow::editClass(QTableWidgetItem *item, int nRow, int nColumn)
 {
-    QList<QVariant> *newData = new QList<QVariant>;
-    newData->append(QVariant(name));
-    newData->append(QVariant(grade));
-    newData->append(QVariant(section));
-    newData->append(QVariant(notes));
-    newData->append(QVariant(nRow));
-    newData->append(QVariant(nColumn));
-
-    QVariant *dataToAdd = new QVariant(*newData);
-
-    QTableWidgetItem *newItem = new QTableWidgetItem( QString("%1\n%2\n00%3").arg(name).arg(grade).arg(section) );
-    newItem->setTextAlignment(Qt::AlignCenter);
-    newItem->setData(Qt::UserRole, *dataToAdd);
-
+    QTableWidgetItem *newItem = new QTableWidgetItem(*item);
     this->m_undoStack->push( new CommandClassEdit(nRow, nColumn, newItem, this->m_pTableWidget) );
 }
 

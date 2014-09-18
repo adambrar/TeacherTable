@@ -17,8 +17,8 @@ CommandClassMove::CommandClassMove(int nToRow, int nToCol, \
     toRow = nToRow;
     toCol = nToCol;
     setText(QString("%1, %2 -> %3, %4").arg( \
-                QString::number(fromCol)).arg(QString::number(fromRow)).arg( \
-                    QString::number(toCol)).arg(QString::number(toRow)));
+                QString::number(fromRow)).arg(QString::number(fromCol)).arg( \
+                    QString::number(toRow)).arg(QString::number(toCol)));
 }
 
 CommandClassMove::~CommandClassMove()

@@ -9,45 +9,47 @@ HorizontalHeaderView::HorizontalHeaderView(MainTableWidget* m_pTableWidget, QWid
 {
     this->m_tableWidget = m_pTableWidget;
     this->pressedPoint = QPoint(0,0);
-    this->releasedPoint = QPoint(0,0);
     this->setMouseTracking(false);
     this->blackedOutCols = 1;
+    this->pressedLogicalIndex = this->pressedVisualIndex = 0;
 }
 
 void HorizontalHeaderView::mousePressEvent(QMouseEvent *event)
 {
     this->pressedPoint = event->pos();
+    this->pressedLogicalIndex = this->logicalIndexAt(event->pos());
+    this->pressedVisualIndex = this->visualIndex(this->pressedLogicalIndex);
 
     QHeaderView::mousePressEvent(event);
 }
 
 void HorizontalHeaderView::mouseReleaseEvent(QMouseEvent *event)
 {
-    this->releasedPoint = event->pos();
-    int colWidth = this->m_tableWidget->columnWidth(0);
-
     QHeaderView::mouseReleaseEvent(event);
 
-    if(this->releasedPoint != this->pressedPoint)
+    if(event->pos() != this->pressedPoint)
     {
-        int fromIndex = this->visualIndexAt(this->pressedPoint.x());
-        int toIndex = this->visualIndexAt(this->releasedPoint.x());
+        int toVisualIndex = this->visualIndex(this->pressedLogicalIndex);
 
-        if(event->pos().x() < colWidth/2)
+        if(toVisualIndex < this->blackedOutCols)
         {
-            this->m_tableWidget->horizontalHeader()->swapSections(1,0);
-            toIndex = 1;
+            this->m_tableWidget->horizontalHeader()->moveSection(toVisualIndex, this->blackedOutCols);
+            toVisualIndex = this->blackedOutCols;
         }
 
-        emit teacherMoved(fromIndex, toIndex);
+        if(this->pressedVisualIndex < this->blackedOutCols)
+        {
+            this->m_tableWidget->horizontalHeader()->moveSection(toVisualIndex, this->pressedVisualIndex);
+            return;
+        }
+
+        emit teacherMoved(this->pressedVisualIndex, toVisualIndex);
     }
 }
 
 void HorizontalHeaderView::mouseMoveEvent(QMouseEvent *event)
 {
-    QTableWidgetItem *item = this->m_tableWidget->itemAt(this->pressedPoint);
-
-    if(this->m_tableWidget->visualColumn(item->column()) == 0 || item == 0)
+    if(pressedVisualIndex < this->blackedOutCols)
         return;
 
     QHeaderView::mouseMoveEvent(event);

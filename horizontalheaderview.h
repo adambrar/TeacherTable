@@ -23,7 +23,8 @@ public slots:
 private:
     MainTableWidget* m_tableWidget;
     QPoint pressedPoint;
-    QPoint releasedPoint;
+    int pressedLogicalIndex;
+    int pressedVisualIndex;
     int blackedOutCols;
 };
 

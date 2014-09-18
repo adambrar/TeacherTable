@@ -33,8 +33,8 @@ private slots:
     void headerSelected(int);
     void cellDoubleClicked(int, int);
 
-    void setClass(QString, QString, QString, QString, int, int);
-    void editClass(QString, QString, QString, QString, int, int);
+    void setClass(QTableWidgetItem*, int, int);
+    void editClass(QTableWidgetItem*, int, int);
     void deleteClass();
     void moveClass(QTableWidgetItem*, int toRow, int toCol, \
                    int fromRow, int fromCol);

@@ -21,14 +21,15 @@ MainTableWidget::MainTableWidget(QWidget *parent) :
 
     this->hHeaderView = new HorizontalHeaderView(this);
     this->setHorizontalHeader( hHeaderView );
+    this->blackoutColumns = 1;
 }
 
 void MainTableWidget::mouseMoveEvent(QMouseEvent *event)
 {
     QTableWidgetItem *item = this->itemAt(event->pos());
 
-    if(this->visualColumn(item->column()) == 0)
-        return;
+    if(item == 0 || this->visualColumn(item->column()) < this->blackoutColumns)
+            return;
 
     this->movingItem = new QTableWidgetItem( *itemAt( event->pos() ));
     this->fromIndex = indexAt(event->pos());
@@ -41,7 +42,7 @@ void MainTableWidget::dropEvent(QDropEvent *event)
     QModelIndex toIndex = indexAt(event->pos());
     QTableWidgetItem *item = this->itemAt(event->pos());
 
-    if(this->visualColumn(item->column()) == 0)
+    if(item == 0 || this->visualColumn(item->column()) < this->blackoutColumns)
         return;
 
     emit classMoved(movingItem, toIndex.row(), toIndex.column(), \

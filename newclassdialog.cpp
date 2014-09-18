@@ -8,6 +8,7 @@
 #include <QIntValidator>
 #include <QButtonGroup>
 #include <QTextEdit>
+#include <QTableWidgetItem>
 
 NewClassDialog::NewClassDialog(int row, int column, QString name, \
                                QString grade, QString section, QString notes, QWidget *parent) :
@@ -59,8 +60,46 @@ void NewClassDialog::getInput()
     if( classNameInput->text() == "")
         classNameInput->setText("=======");
 
-    QString classGradeInputString("");
+    QString classGradeInputString = this->getGradeString();
+
+    if(classSectionInput->text() == "")
+        classSectionInput->setText("0");
+
+    QTableWidgetItem* newItem = createClass(classNameInput->text().toUpper(), classGradeInputString, \
+                                            classSectionInput->text(), classAdditionalNotes->toPlainText());
+
+    emit newClassInput( newItem, this->nRow, this->nColumn );
+    close();
+}
+
+QTableWidgetItem* NewClassDialog::createClass(QString name, QString grade, QString section, QString notes)
+{
+    QList<QVariant> *newData = new QList<QVariant>;
+    newData->append(QVariant(name));
+    newData->append(QVariant(grade));
+    newData->append(QVariant(section));
+    newData->append(QVariant(notes));
+    newData->append(QVariant(nRow));
+    newData->append(QVariant(nColumn));
+
+    QVariant *dataToAdd = new QVariant(*newData);
+
+    QTableWidgetItem *newItem = new QTableWidgetItem( QString("%1\n%2\n00%3").arg(name).arg(grade).arg(section) );
+    newItem->setTextAlignment(Qt::AlignCenter);
+    newItem->setData(Qt::UserRole, *dataToAdd);
+
+    return newItem;
+}
+
+void NewClassDialog::cancelAdd()
+{
+    close();
+}
+
+QString NewClassDialog::getGradeString()
+{
     QList<QString> checkedGrades;
+    QString returnString;
 
     foreach(QCheckBox *input, gradeInput)
     {
@@ -71,23 +110,13 @@ void NewClassDialog::getInput()
     }
 
     if(checkedGrades.size() == 1)
-        classGradeInputString.append( checkedGrades.first() );
+        returnString.append( checkedGrades.first() );
     else if(checkedGrades.size() > 1)
-        classGradeInputString.append( QString("%1 - %2").arg( checkedGrades.first() ).arg( checkedGrades.last() ) );
+        returnString.append( QString("%1 - %2").arg( checkedGrades.first() ).arg( checkedGrades.last() ) );
     else if(checkedGrades.size() < 1)
-        classGradeInputString.append( QString("xx - xx") );
+        returnString.append( QString("xx - xx") );
 
-    if(classSectionInput->text() == "")
-        classSectionInput->setText("0");
-
-    emit newClassInput( classNameInput->text().toUpper(), classGradeInputString, classSectionInput->text(), \
-                        classAdditionalNotes->toPlainText(), this->nRow, this->nColumn );
-    close();
-}
-
-void NewClassDialog::cancelAdd()
-{
-    close();
+    return returnString;
 }
 
 QHBoxLayout* NewClassDialog::createGradeInput(QString currentGrade)
