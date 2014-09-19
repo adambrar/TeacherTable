@@ -3,13 +3,13 @@
 
 #include <QUndoCommand>
 
-class QTableWidget;
+class MainTableWidget;
 class QTableWidgetItem;
 
 class CommandClassAdd : public QUndoCommand
 {
 public:
-    explicit CommandClassAdd(int, int, QTableWidgetItem*, QTableWidget*, QObject *parent = 0);
+    explicit CommandClassAdd(int, int, QTableWidgetItem*, MainTableWidget*, QObject *parent = 0);
     ~CommandClassAdd();
 
     //reset cell to old widget, m_fromClass
@@ -19,7 +19,7 @@ public:
     virtual void redo();
     
 private:
-    QTableWidget *m_tableWidget;
+    MainTableWidget *m_tableWidget;
     QTableWidgetItem *m_fromClass;
     QTableWidgetItem *m_toClass;
 

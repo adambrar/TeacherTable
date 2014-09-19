@@ -4,12 +4,12 @@
 #include <QUndoCommand>
 #include <QTableWidgetItem>
 
-class QTableWidget;
+class MainTableWidget;
 
 class CommandClassMove : public QUndoCommand
 {
 public:
-    explicit CommandClassMove(int, int, int, int, QTableWidget*, \
+    explicit CommandClassMove(int, int, int, int, MainTableWidget*, \
                               QTableWidgetItem*, QObject *parent = 0);
     ~CommandClassMove();
 
@@ -22,7 +22,7 @@ signals:
 public slots:
 
 private:
-    QTableWidget *m_tableWidget;
+    MainTableWidget *m_tableWidget;
     QTableWidgetItem m_fromClass;
     QTableWidgetItem m_toClass;
     int fromRow;

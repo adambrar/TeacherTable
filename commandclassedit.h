@@ -4,12 +4,12 @@
 #include <QUndoCommand>
 
 class QTableWidgetItem;
-class QTableWidget;
+class MainTableWidget;
 
 class CommandClassEdit : public QUndoCommand
 {
 public:
-    explicit CommandClassEdit(int, int, QTableWidgetItem*, QTableWidget*, QObject *parent = 0);
+    explicit CommandClassEdit(int, int, QTableWidgetItem*, MainTableWidget*, QObject *parent = 0);
 
     ~CommandClassEdit();
 
@@ -28,7 +28,7 @@ private:
     QTableWidgetItem *m_fromClass;
     QTableWidgetItem *m_toClass;
 
-    QTableWidget *m_tableWidget;
+    MainTableWidget *m_tableWidget;
 };
 
 #endif // COMMANDCLASSEDIT_H

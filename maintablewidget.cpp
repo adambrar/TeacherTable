@@ -1,6 +1,7 @@
 #include "maintablewidget.h"
 #include "commandclassmove.h"
 #include "horizontalheaderview.h"
+#include "maintableoptions.h"
 
 #include <QTableWidget>
 #include <QMouseEvent>
@@ -22,6 +23,7 @@ MainTableWidget::MainTableWidget(QWidget *parent) :
     this->hHeaderView = new HorizontalHeaderView(this);
     this->setHorizontalHeader( hHeaderView );
     this->blackoutColumns = 1;
+    this->tableOptions = new MainTableOptions;
 }
 
 MainTableWidget::~MainTableWidget()

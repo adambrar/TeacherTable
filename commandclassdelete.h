@@ -3,14 +3,14 @@
 
 #include <QUndoCommand>
 
-class QTableWidget;
+class MainTableWidget;
 class QTableWidgetItem;
 
 class CommandClassDelete : public QUndoCommand
 {
 public:
     explicit CommandClassDelete(int nRow, int nColumn, QTableWidgetItem *nClass, \
-                                QTableWidget *nTableWidget, QObject *parent = 0);
+                                MainTableWidget *nTableWidget, QObject *parent = 0);
     ~CommandClassDelete();
 
     virtual void undo();
@@ -18,7 +18,7 @@ public:
     virtual void redo();
 
 private:
-    QTableWidget *m_tableWidget;
+    MainTableWidget *m_tableWidget;
     QTableWidgetItem *m_class;
     int row;
     int col;

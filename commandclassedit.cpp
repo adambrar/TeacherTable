@@ -1,10 +1,10 @@
 #include "commandclassedit.h"
-#include "mainwindow.h"
+#include "maintablewidget.h"
 
 #include <QTableWidget>
 
 CommandClassEdit::CommandClassEdit(int nRow, int nCol, QTableWidgetItem *toClass, \
-                                   QTableWidget *nTableWidget, QObject*)
+                                   MainTableWidget *nTableWidget, QObject*)
 {
     this->row = nRow;
     this->col = nCol;
@@ -33,24 +33,7 @@ void CommandClassEdit::undo()
 
     QString grade = m_fromClass->data(Qt::UserRole).toStringList().at(1);
 
-    if(grade == "8")
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(255,0,0,100));
-    else if(grade == "9")
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(255,255,0,100));
-    else if(grade == "10")
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(0,255,0,100));
-    else if(grade == "11")
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(0,255,255,100));
-    else if(grade == "12")
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(0,0,255,100));
-    else
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(255,0,255));
+    m_tableWidget->item(row, col)->setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor(grade));
 
 }
 
@@ -60,23 +43,6 @@ void CommandClassEdit::redo()
 
     QString grade = m_toClass->data(Qt::UserRole).toStringList().at(1);
 
-    if(grade == "8")
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(255,0,0,100));
-    else if(grade == "9")
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(255,255,0,100));
-    else if(grade == "10")
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(0,255,0,100));
-    else if(grade == "11")
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(0,255,255,100));
-    else if(grade == "12")
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(0,0,255,100));
-    else
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(255,0,255));
+    m_tableWidget->item(row, col)->setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor(grade));
 
 }

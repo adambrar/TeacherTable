@@ -1,11 +1,11 @@
 #include "commandclassdelete.h"
+#include "maintablewidget.h"
 
-#include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QUndoStack>
 
 CommandClassDelete::CommandClassDelete(int nRow, int nColumn, QTableWidgetItem *nClass, \
-                                       QTableWidget *nTableWidget, QObject*)
+                                       MainTableWidget *nTableWidget, QObject*)
 {
     this->row = nRow;
     this->col = nColumn;
@@ -28,36 +28,14 @@ void CommandClassDelete::undo()
     if( m_class->data(Qt::UserRole).toString().isEmpty() )
     {
         m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(255,255,255));
+                setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor());
         return;
     }
 
     QString grade = m_class->data(Qt::UserRole).toStringList().at(1);
 
-    if(grade == "8")
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(255,0,0));
-    else if(grade == "9")
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(255,255,0));
-    else if(grade == "10")
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(0,255,0));
-    else if(grade == "11")
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(0,255,255));
-    else if(grade == "12")
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(0,0,255,100));
-    else if(grade.contains("8"))
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(255,0,255));
-    else if(grade.contains("9"))
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(255,50,255));
-    else if(grade.contains("10"))
-        m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(255,100,255));
+    m_tableWidget->item(row, col)-> \
+            setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor(grade));
 
 }
 
@@ -66,6 +44,6 @@ void CommandClassDelete::redo()
 {
     m_tableWidget->setItem(row, col, new QTableWidgetItem(" \n \n "));
     m_tableWidget->item(row, col)-> \
-            setBackgroundColor(QColor(255,255,255));
+            setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor());
 
 }

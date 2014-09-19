@@ -2,6 +2,7 @@
 #define MAINTABLEWIDGET_H
 
 #include <QTableWidget>
+#include "maintableoptions.h"
 
 class QUndoStack;
 class QModelIndex;
@@ -43,6 +44,7 @@ public:
     int BlackoutColumns() const { return blackoutColumns; }
 
     HorizontalHeaderView *getHHeaderView() const;
+    MainTableOptions *TableOptions() const { return tableOptions; }
 
 signals:
     void classMoved(QTableWidgetItem*, \
@@ -63,6 +65,8 @@ private:
 
     HorizontalHeaderView *hHeaderView;
     int blackoutColumns;
+
+    MainTableOptions *tableOptions;
 };
 
 #endif // MAINTABLEWIDGET_H

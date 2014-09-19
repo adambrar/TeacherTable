@@ -1,11 +1,11 @@
 #include "commandclassmove.h"
+#include "maintablewidget.h"
 
-#include <QTableWidget>
 #include <QTableWidgetItem>
 
 CommandClassMove::CommandClassMove(int nToRow, int nToCol, \
                                    int nFromRow, int nFromCol, \
-                                   QTableWidget *m_pTableWidget, QTableWidgetItem *m_pClass, \
+                                   MainTableWidget *m_pTableWidget, QTableWidgetItem *m_pClass, \
                                    QObject*)
 {
     m_tableWidget = m_pTableWidget;
