@@ -107,23 +107,23 @@ void NewClassDialog::cancelAdd()
 
 QString NewClassDialog::getGradeString(QString *classGradeData)
 {
-    QList<QString> checkedGrades;
     QString returnString;
 
     foreach(QCheckBox *input, gradeInput)
     {
         if(input->isChecked())
         {
-            checkedGrades.append(input->text());
             classGradeData->append( QString("%1 ").arg(input->text()) );
         }
     }
 
-    if(checkedGrades.size() == 1)
-        returnString.append( checkedGrades.first() );
-    else if(checkedGrades.size() > 1)
-        returnString.append( QString("%1 - %2").arg( checkedGrades.first() ).arg( checkedGrades.last() ) );
-    else if(checkedGrades.size() < 1)
+    QStringList gradeString = classGradeData->split(" ", QString::SkipEmptyParts);
+
+    if(gradeString.size() == 1)
+        returnString.append( gradeString.first() );
+    else if(gradeString.size() > 1)
+        returnString.append( QString("%1 - %2").arg( gradeString.first() ).arg( gradeString.last() ) );
+    else if(gradeString.size() < 1)
         returnString.append( QString("xx - xx") );
 
     return returnString;

@@ -37,13 +37,13 @@ QColor MainTableOptions::getGradeColor(QString grade)
         }
     } else if(grade.contains("9")) {
         newBackgroundColor = this->gradeColors->at(1);
-        if(grade.length() > 3)
+        if(grade.length() > 2)
         {
             newBackgroundColor = newBackgroundColor.lighter();
         }
     } else if(grade.contains("8")) {
         newBackgroundColor = this->gradeColors->at(0);
-        if(grade.length() > 3)
+        if(grade.length() > 2)
         {
             newBackgroundColor = newBackgroundColor.lighter();
         }
