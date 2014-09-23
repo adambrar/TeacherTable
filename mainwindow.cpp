@@ -120,10 +120,7 @@ void MainWindow::showUndoStack()
 
 void MainWindow::cellContextMenu(QPoint point)
 {
-    if( point.x() > ( this->m_pTableWidget->columnWidth(0)*(this->m_pTableWidget->columnCount()-1) ) )
-    {
-        return;
-    }
+    QTableWidgetItem *clickedItem = this->m_pTableWidget->itemAt(point);
 
     QMenu menu;
     QAction* viewAction;
@@ -132,9 +129,9 @@ void MainWindow::cellContextMenu(QPoint point)
     QAction* copyAction;
     QAction* pasteAction;
 
-    QTableWidgetItem *clickedItem = this->m_pTableWidget->itemAt(point);
-
-    if( (clickedItem->data(Qt::UserRole).isNull() || clickedItem == 0) )
+    if( clickedItem == 0 || clickedItem->text() == " \n \n " \
+            || this->m_pTableWidget->visualColumn(clickedItem->column()) < \
+                                            this->m_pTableWidget->BlackoutColumns() )
     {
         if(this->m_pTableWidget->getCopiedItem()->text() != QString(" \n \n "))
         {
@@ -157,10 +154,10 @@ void MainWindow::cellContextMenu(QPoint point)
 
         NewClassDialog *editWindow = new NewClassDialog(clickedItem->row(), \
                                                        clickedItem->column(), \
-                                                       data.at(0).toString(), \
-                                                       data.at(1).toString(), \
-                                                       data.at(2).toString(), \
-                                                       data.at(3).toString(), \
+                                                       data.at(MainTableOptions::ClassName).toString(), \
+                                                       data.at(MainTableOptions::ClassGrade).toString(), \
+                                                       data.at(MainTableOptions::ClassSection).toString(), \
+                                                       data.at(MainTableOptions::ClassNotes).toString(), \
                                                        this);
 
         connect( editWindow , SIGNAL(newClassInput(QString,QString,QString,QString, int, int)), \
@@ -174,7 +171,7 @@ void MainWindow::cellContextMenu(QPoint point)
                                                   clickedItem->column(), \
                                                   clickedItem, this->m_pTableWidget) );
     } else if ( clickedAction == viewAction ) {
-        QString displayedMessage = clickedItem->data(Qt::UserRole).toList().at(3).toString();
+        QString displayedMessage = clickedItem->data(Qt::UserRole).toList().at(MainTableOptions::ClassNotes).toString();
 
         QMessageBox::information( this, "Class Notes", displayedMessage );
     } else if ( clickedAction == copyAction ) {
@@ -186,10 +183,11 @@ void MainWindow::cellContextMenu(QPoint point)
 
 void MainWindow::headerContextMenu(QPoint point)
 {
-    if( point.x() > ( this->m_pTableWidget->columnWidth(0)*(this->m_pTableWidget->columnCount()-1) ) )\
-    {
+    QTableWidgetItem *clickedItem = this->m_pTableWidget->itemAt(point);
+
+    if( clickedItem == 0 || this->m_pTableWidget->visualColumn(clickedItem->column()) < \
+                                                            this->m_pTableWidget->BlackoutColumns() )
         return;
-    }
 
     QTableWidgetItem *item = this->m_pTableWidget->itemAt(point);
     int clickedColumn = item->column();
@@ -236,10 +234,10 @@ void MainWindow::cellDoubleClicked(int nRow, int nCol)
         QList<QVariant> data = clickedItem->data(Qt::UserRole).toList();
         newClass = new NewClassDialog(clickedItem->row(), \
                                        clickedItem->column(), \
-                                       data.at(0).toString(), \
-                                       data.at(1).toString(), \
-                                       data.at(2).toString(), \
-                                       data.at(3).toString());
+                                       data.at(MainTableOptions::ClassName).toString(), \
+                                       data.at(MainTableOptions::ClassGrade).toString(), \
+                                       data.at(MainTableOptions::ClassSection).toString(), \
+                                       data.at(MainTableOptions::ClassNotes).toString());
         newClass->setWindowTitle("Edit A Class");
         connect( newClass, SIGNAL(newClassInput(QTableWidgetItem*, int, int)), \
                  this, SLOT(editClass(QTableWidgetItem*, int, int)) );

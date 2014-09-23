@@ -1,5 +1,6 @@
 #include "commandclasspaste.h"
 #include "maintablewidget.h"
+#include "maintableoptions.h"
 
 #include <QTableWidgetItem>
 
@@ -10,19 +11,19 @@ CommandClassPaste::CommandClassPaste(int currentRow, int currentColumn, \
     this->m_fromClass = new QTableWidgetItem( *tableWidget->item(currentRow, currentColumn) );
 
     QStringList oldData = tableWidget->getCopiedItem()->data(Qt::UserRole).toStringList();
-    int section = oldData.at(2).toInt();
+    int section = oldData.at(MainTableOptions::ClassSection).toInt();
     section += tableWidget->getCopiedItemNumber();
 
     oldData.replace(2, QString("%1").arg(section));
     QVariant *newData = new QVariant((QVariant)oldData);
 
-    QString gradeString = tableWidget->getCopiedItem()->text().split("\n").at(1);
+    QString gradeString = tableWidget->getCopiedItem()->text().split("\n").at(MainTableOptions::ClassGrade);
 
     this->m_toClass = new QTableWidgetItem( *tableWidget->getCopiedItem() );
     m_toClass->setData(Qt::UserRole, *newData);
-    m_toClass->setText( QString("%1\n%2\n00%3").arg(oldData.at(0)). \
+    m_toClass->setText( QString("%1\n%2\n00%3").arg(oldData.at(MainTableOptions::ClassName)). \
                                                 arg(gradeString). \
-                                                arg(oldData.at(2)) );
+                                                arg(oldData.at(MainTableOptions::ClassSection)) );
 
     this->toRow = currentRow;
     this->toCol = currentColumn;

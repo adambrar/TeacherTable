@@ -52,7 +52,7 @@ QList<float> RowGradesDialog::countGrades()
         if(currentItem->data(Qt::UserRole).toStringList().isEmpty())
             continue;
 
-        QString grades = currentItem->data(Qt::UserRole).toStringList().at(1);
+        QString grades = currentItem->data(Qt::UserRole).toStringList().at(MainTableOptions::ClassGrade);
         float valueAdded = 1;
         if(grades.size() > 2)
             valueAdded = 0.5;

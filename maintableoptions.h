@@ -11,6 +11,8 @@ public:
 
     QColor getGradeColor(QString grade = "");
 
+    enum classDataType{ClassName, ClassGrade, ClassSection, ClassNotes, \
+                       ClassRow, ClassCol, ClassHighlight};
 signals:
 
 public slots:

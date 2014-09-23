@@ -31,7 +31,7 @@ void CommandClassEdit::undo()
 {
     m_tableWidget->setItem( row, col, new QTableWidgetItem(*m_fromClass) );
 
-    QString grade = m_fromClass->data(Qt::UserRole).toStringList().at(1);
+    QString grade = m_fromClass->data(Qt::UserRole).toStringList().at(MainTableOptions::ClassGrade);
 
     m_tableWidget->item(row, col)->setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor(grade));
 
@@ -41,7 +41,7 @@ void CommandClassEdit::redo()
 {
     m_tableWidget->setItem( row, col, new QTableWidgetItem(*m_toClass) );
 
-    QString grade = m_toClass->data(Qt::UserRole).toStringList().at(1);
+    QString grade = m_toClass->data(Qt::UserRole).toStringList().at(MainTableOptions::ClassGrade);
 
     m_tableWidget->item(row, col)->setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor(grade));
 

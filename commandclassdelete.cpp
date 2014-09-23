@@ -32,7 +32,7 @@ void CommandClassDelete::undo()
         return;
     }
 
-    QString grade = m_class->data(Qt::UserRole).toStringList().at(1);
+    QString grade = m_class->data(Qt::UserRole).toStringList().at(MainTableOptions::ClassGrade);
 
     m_tableWidget->item(row, col)-> \
             setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor(grade));
