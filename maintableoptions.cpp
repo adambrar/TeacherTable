@@ -67,33 +67,6 @@ QColor MainTableOptions::getGradeColor(QString grade)
     return newBackgroundColor;
 }
 
-
-QBrush MainTableOptions::getBrush(QColor color, int brushType) const
-{
-    QBrush returnBrush(color);
-
-    switch(brushType)
-    {
-        case 1:
-            returnBrush.setStyle(Qt::Dense4Pattern);
-            break;
-        case 2:
-            returnBrush.setStyle(Qt::Dense5Pattern);
-            break;
-        case 3:
-            returnBrush.setStyle(Qt::Dense6Pattern);
-            break;
-        case 4:
-            returnBrush.setStyle(Qt::Dense7Pattern);
-            break;
-        default:
-            returnBrush.setStyle(Qt::SolidPattern);
-
-    }
-
-    return returnBrush;
-}
-
 QMenu *MainTableOptions::getHighlightMenu() const
 {
     return highlightMenu;

@@ -27,7 +27,7 @@ void CommandClassDelete::undo()
 {
     m_tableWidget->setItem(row, col, new QTableWidgetItem(*m_class));
 
-    if( m_class->data(Qt::UserRole).toString().isEmpty() )
+    if( m_class->data(Qt::UserRole).toStringList().isEmpty() )
     {
         m_tableWidget->item(row, col)-> \
                 setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor());

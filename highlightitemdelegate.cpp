@@ -14,7 +14,8 @@ void HighlightItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 {
     QItemDelegate::paint(painter, option, index);
 
-    if( index.data(Qt::UserRole).toStringList().isEmpty() ) {
+    if( index.data(Qt::UserRole).toStringList().isEmpty() ||
+            index.data(Qt::UserRole).toStringList().size() <= 1 ) {
         return;
     } else {
         QString data = index.data(Qt::UserRole).toStringList().at(MainTableOptions::ClassHighlight);
@@ -22,24 +23,23 @@ void HighlightItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         QPen pen;
         pen.setWidth(3);
 
-        if( data == "None" ) {
-            pen.setColor(painter->background().color());
-
-        } else if( data == "Highlight 1") {
-            pen.setColor( Qt::red);
-
+        if( data == "Highlight 1") {
+            pen.setColor( QColor(220,20,60) );
+            painter->setPen(pen);
+            painter->drawRect(option.rect);
         } else if( data == "Highlight 2") {
-            pen.setColor( Qt::blue);
-
+            pen.setColor( QColor(25,25,112) );
+            painter->setPen(pen);
+            painter->drawRect(option.rect);
         } else if( data == "Highlight 3") {
-            pen.setColor( Qt::yellow);
-
+            pen.setColor( QColor(30,144,255) );
+            painter->setPen(pen);
+            painter->drawRect(option.rect);
         } else if( data == "Highlight 4") {
-            pen.setColor( Qt::green);
-
+            pen.setColor( QColor(255,215,0) );
+            painter->setPen(pen);
+            painter->drawRect(option.rect);
         }
 
-        painter->setPen(pen);
-        painter->drawRect(option.rect);
     }
 }

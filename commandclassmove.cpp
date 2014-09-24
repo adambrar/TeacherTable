@@ -28,6 +28,7 @@ CommandClassMove::~CommandClassMove()
 void CommandClassMove::undo()
 {
     m_tableWidget->setItem( fromRow, fromCol, new QTableWidgetItem(*m_toClass) );
+    m_fromClass->setData( Qt::UserRole, QVariant(0) );
     m_tableWidget->setItem( toRow, toCol, new QTableWidgetItem(*m_fromClass) );
 }
 

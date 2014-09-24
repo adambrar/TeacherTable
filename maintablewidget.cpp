@@ -47,6 +47,8 @@ void MainTableWidget::dropEvent(QDropEvent *event)
 {
     QModelIndex toIndex = this->indexAt(event->pos());
     QTableWidgetItem *item = this->itemAt(event->pos());
+    this->hide();
+    this->show();
 
     if(item == 0 || this->visualColumn(item->column()) < this->blackoutColumns)
         return;
@@ -114,6 +116,8 @@ void MainTableWidget::insertInstructions( QTableWidget *m_pTableWidget )
         newItem->setTextAlignment(Qt::AlignCenter);
 
         newItem->setFlags(newItem->flags() & ~Qt::ItemIsEnabled & ~Qt::ItemIsDropEnabled);
+        newItem->setData(Qt::UserRole, (QVariant)QString("0"));
+
         m_pTableWidget->setItem(row, lastCol, newItem);
 
         m_pTableWidget->resizeRowToContents(row);

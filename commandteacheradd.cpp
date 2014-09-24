@@ -63,15 +63,13 @@ void CommandTeacherAdd::redo()
         //insert data
         for (int row = 0; row < m_tableWidget->rowCount(); row++)
         {
-            QTableWidgetItem *newItem = new QTableWidgetItem \
-                    (QString(" \n \n "));
+            QTableWidgetItem *newItem = new QTableWidgetItem(QString(" \n \n "));
             newItem->setTextAlignment(Qt::AlignCenter);
+            newItem->setData(Qt::UserRole, (QVariant)QString("1"));
+            newItem->setBackground(Qt::white);
 
             m_tableWidget->setItem(row, m_tableWidget->columnCount() - 1, newItem);
 
-            m_tableWidget->resizeRowToContents(row);
-            m_tableWidget->item( row, m_tableWidget->columnCount() - 1)-> \
-                    setBackgroundColor(QColor(255,255,255) );
         }
 
     }

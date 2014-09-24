@@ -17,8 +17,6 @@ public:
     QMenu *getHighlightMenu() const;
     void makeHighlightMenu() const;
 
-    QBrush getBrush(QColor, int) const;
-
     enum ClassDataType{ClassName, ClassGrade, ClassSection, ClassNotes, \
                        ClassRow, ClassCol, ClassHighlight};
 
@@ -30,8 +28,6 @@ private:
     QList<QColor> *gradeColors;
 
     QMenu *highlightMenu;
-
-    QList<QBrush> *classBrushes;
 
 };
 
