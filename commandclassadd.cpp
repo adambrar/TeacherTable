@@ -4,6 +4,7 @@
 
 #include <QTableWidgetItem>
 #include <QUndoCommand>
+#include <QBrush>
 
 CommandClassAdd::CommandClassAdd(int nRow, int nCol, QTableWidgetItem *nClass, \
                                  MainTableWidget *nTableWidget, QObject*)
@@ -19,6 +20,7 @@ CommandClassAdd::CommandClassAdd(int nRow, int nCol, QTableWidgetItem *nClass, \
         this->m_fromClass = new QTableWidgetItem(" \n \n ");
     } else {
         this->m_fromClass = new QTableWidgetItem( *(nTableWidget->item(nRow, nCol)) );
+        this->oldBrush = new QBrush( nTableWidget->item(nRow,nCol)->background() );
     }
 
     setText( QString("Class added at %1, %2").arg(nRow).arg(nCol));
@@ -28,12 +30,12 @@ CommandClassAdd::~CommandClassAdd()
 {
     delete this->m_toClass;
     delete this->m_fromClass;
+    delete this->oldBrush;
 }
 
 void CommandClassAdd::undo()
 {
     m_tableWidget->setItem( row, col, new QTableWidgetItem(*m_fromClass) );
-
 }
 
 void CommandClassAdd::redo()

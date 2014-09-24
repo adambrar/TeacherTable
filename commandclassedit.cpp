@@ -18,6 +18,7 @@ CommandClassEdit::CommandClassEdit(int nRow, int nCol, QTableWidgetItem *toClass
     } else {
         this->m_fromClass = new QTableWidgetItem( *(nTableWidget->item(nRow, nCol)) );
     }
+
     setText( QString("Class edit at %1, %2").arg(nRow).arg(nCol) );
 }
 
@@ -34,7 +35,6 @@ void CommandClassEdit::undo()
     QString grade = m_fromClass->data(Qt::UserRole).toStringList().at(MainTableOptions::ClassGrade);
 
     m_tableWidget->item(row, col)->setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor(grade));
-
 }
 
 void CommandClassEdit::redo()
@@ -42,7 +42,5 @@ void CommandClassEdit::redo()
     m_tableWidget->setItem( row, col, new QTableWidgetItem(*m_toClass) );
 
     QString grade = m_toClass->data(Qt::UserRole).toStringList().at(MainTableOptions::ClassGrade);
-
     m_tableWidget->item(row, col)->setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor(grade));
-
 }

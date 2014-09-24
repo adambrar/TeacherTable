@@ -23,7 +23,7 @@ private:
     int row;
     int col;
 
-
+    QBrush *oldBrush;
     
 };
 

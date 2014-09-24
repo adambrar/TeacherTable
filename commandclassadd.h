@@ -23,6 +23,8 @@ private:
     QTableWidgetItem *m_fromClass;
     QTableWidgetItem *m_toClass;
 
+    QBrush *oldBrush;
+
     int row;
     int col;
 

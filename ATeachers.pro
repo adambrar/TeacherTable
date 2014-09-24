@@ -29,7 +29,9 @@ SOURCES += main.cpp\
     horizontalheaderview.cpp \
     commandteachermove.cpp \
     rowgradesdialog.cpp \
-    maintableoptions.cpp
+    maintableoptions.cpp \
+    commandclasshighlight.cpp \
+    highlihgtitemdelegate.cpp
 
 HEADERS  += \
     commandclassadd.h \
@@ -48,4 +50,6 @@ HEADERS  += \
     horizontalheaderview.h \
     commandteachermove.h \
     rowgradesdialog.h \
-    maintableoptions.h
+    maintableoptions.h \
+    commandclasshighlight.h \
+    highlihgtitemdelegate.h

@@ -2,9 +2,9 @@
 #define COMMANDCLASSMOVE_H
 
 #include <QUndoCommand>
-#include <QTableWidgetItem>
 
 class MainTableWidget;
+class QTableWidgetItem;
 
 class CommandClassMove : public QUndoCommand
 {
@@ -23,8 +23,8 @@ public slots:
 
 private:
     MainTableWidget *m_tableWidget;
-    QTableWidgetItem m_fromClass;
-    QTableWidgetItem m_toClass;
+    QTableWidgetItem *m_fromClass;
+    QTableWidgetItem *m_toClass;
     int fromRow;
     int fromCol;
     int toRow;

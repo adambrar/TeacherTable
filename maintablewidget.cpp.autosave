@@ -45,7 +45,7 @@ void MainTableWidget::mouseMoveEvent(QMouseEvent *event)
 
 void MainTableWidget::dropEvent(QDropEvent *event)
 {
-    QModelIndex toIndex = indexAt(event->pos());
+    QModelIndex toIndex = this->indexAt(event->pos());
     QTableWidgetItem *item = this->itemAt(event->pos());
 
     if(item == 0 || this->visualColumn(item->column()) < this->blackoutColumns)

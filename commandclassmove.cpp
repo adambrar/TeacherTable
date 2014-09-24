@@ -9,8 +9,8 @@ CommandClassMove::CommandClassMove(int nToRow, int nToCol, \
                                    QObject*)
 {
     m_tableWidget = m_pTableWidget;
-    m_toClass = QTableWidgetItem(*m_pClass);
-    m_fromClass = QTableWidgetItem(*m_pTableWidget->item(nToRow, nToCol));
+    m_toClass = new QTableWidgetItem(*m_pClass);
+    m_fromClass = new QTableWidgetItem(*m_pTableWidget->item(nToRow, nToCol));
 
     fromRow = nFromRow;
     fromCol = nFromCol;
@@ -27,12 +27,12 @@ CommandClassMove::~CommandClassMove()
 
 void CommandClassMove::undo()
 {
-    m_tableWidget->setItem( fromRow, fromCol, new QTableWidgetItem(m_toClass) );
-    m_tableWidget->setItem( toRow, toCol, new QTableWidgetItem(m_fromClass) );
+    m_tableWidget->setItem( fromRow, fromCol, new QTableWidgetItem(*m_toClass) );
+    m_tableWidget->setItem( toRow, toCol, new QTableWidgetItem(*m_fromClass) );
 }
 
 void CommandClassMove::redo()
 {
-    m_tableWidget->setItem( toRow, toCol, new QTableWidgetItem(m_toClass) );
+    m_tableWidget->setItem( toRow, toCol, new QTableWidgetItem(*m_toClass) );
     m_tableWidget->setItem( fromRow, fromCol, new QTableWidgetItem(" \n \n ") );
 }

@@ -12,6 +12,8 @@ CommandClassDelete::CommandClassDelete(int nRow, int nColumn, QTableWidgetItem *
     this->m_class = new QTableWidgetItem(*nClass);
     this->m_tableWidget = nTableWidget;
 
+    this->oldBrush = new QBrush( nTableWidget->item(nRow, nColumn)->background() );
+
     setText( QString("Class deleted at %1, %2").arg(nRow).arg(nColumn));
 }
 
@@ -29,20 +31,19 @@ void CommandClassDelete::undo()
     {
         m_tableWidget->item(row, col)-> \
                 setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor());
-        return;
+    } else {
+        QString grade = m_class->data(Qt::UserRole).toStringList().at(MainTableOptions::ClassGrade);
+
+        m_tableWidget->item(row, col)-> \
+                setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor(grade));
     }
-
-    QString grade = m_class->data(Qt::UserRole).toStringList().at(MainTableOptions::ClassGrade);
-
-    m_tableWidget->item(row, col)-> \
-            setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor(grade));
-
 }
 
 //removes class item from cell and colors cell white
 void CommandClassDelete::redo()
 {
     m_tableWidget->setItem(row, col, new QTableWidgetItem(" \n \n "));
+
     m_tableWidget->item(row, col)-> \
             setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor());
 

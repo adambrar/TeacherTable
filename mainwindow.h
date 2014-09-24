@@ -41,6 +41,7 @@ private slots:
                    int fromRow, int fromCol);
     void copyClass();
     void pasteClass();
+    void highlightClass(int, int, QString);
 
     void createNewTeachers(QTextEdit*);
     void editTeacher(QString, int);

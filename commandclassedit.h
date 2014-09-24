@@ -25,6 +25,8 @@ private:
     int row;
     int col;
 
+    QBrush *oldBrush;
+
     QTableWidgetItem *m_fromClass;
     QTableWidgetItem *m_toClass;
 

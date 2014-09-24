@@ -7,6 +7,7 @@
 #include "commandclassmove.h"
 #include "commandclassedit.h"
 #include "commandclasspaste.h"
+#include "commandclasshighlight.h"
 #include "commandteacheradd.h"
 #include "commandteacherdelete.h"
 #include "commandteacheredit.h"
@@ -128,23 +129,36 @@ void MainWindow::cellContextMenu(QPoint point)
     QAction* deleteAction;
     QAction* copyAction;
     QAction* pasteAction;
+    QList<QAction *> highlighterActions;
 
-    if( clickedItem == 0 || clickedItem->text() == " \n \n " \
-            || this->m_pTableWidget->visualColumn(clickedItem->column()) < \
+    //if on inaccessible item return
+    if( this->m_pTableWidget->visualColumn(clickedItem->column()) < \
                                             this->m_pTableWidget->BlackoutColumns() )
     {
-        if(this->m_pTableWidget->getCopiedItem()->text() != QString(" \n \n "))
-        {
-            pasteAction = menu.addAction("&Paste");
-        } else {
-            return;
-        }
+        return;
+    }
+    //if able to copy offer action
+    else if( clickedItem->text() == QString(" \n \n ") & \
+             this->m_pTableWidget->getCopiedItem()->text() != QString(" \n \n ") )
+    {
+        pasteAction = menu.addAction("&Paste");
+
+    //otherwise offer all actions
     } else {
+        QMenu *highlightMenu = new QMenu("Highlighters");
+
+        highlighterActions = \
+                this->m_pTableWidget->TableOptions()->getHighlightMenu()->actions();
+
+        foreach(QAction *action, highlighterActions)
+            highlightMenu->addAction(action);
+
         viewAction = menu.addAction("&Notes");
         editAction = menu.addAction("&Edit");
-        deleteAction = menu.addAction("&Delete");
+        menu.addMenu(highlightMenu);
         copyAction = menu.addAction("&Copy");
         pasteAction = menu.addAction("&Paste");
+        deleteAction = menu.addAction("&Delete");
     }
 
     QAction *clickedAction = menu.exec( QCursor::pos() );
@@ -152,16 +166,17 @@ void MainWindow::cellContextMenu(QPoint point)
     if ( clickedAction == editAction ) {
         QList<QVariant> data = clickedItem->data(Qt::UserRole).toList();
 
-        NewClassDialog *editWindow = new NewClassDialog(clickedItem->row(), \
-                                                       clickedItem->column(), \
-                                                       data.at(MainTableOptions::ClassName).toString(), \
-                                                       data.at(MainTableOptions::ClassGrade).toString(), \
-                                                       data.at(MainTableOptions::ClassSection).toString(), \
-                                                       data.at(MainTableOptions::ClassNotes).toString(), \
-                                                       this);
+        NewClassDialog *editWindow = \
+                new NewClassDialog(clickedItem->row(), \
+                                   clickedItem->column(), \
+                                   data.at(MainTableOptions::ClassName).toString(), \
+                                   data.at(MainTableOptions::ClassGrade).toString(), \
+                                   data.at(MainTableOptions::ClassSection).toString(), \
+                                   data.at(MainTableOptions::ClassNotes).toString(), \
+                                   this);
 
-        connect( editWindow , SIGNAL(newClassInput(QString,QString,QString,QString, int, int)), \
-                 this, SLOT(editClass(QString,QString,QString,QString, int, int)) );
+        connect( editWindow , SIGNAL(newClassInput(QTableWidgetItem*, int, int)), \
+                 this, SLOT(editClass(QTableWidgetItem*, int, int)) );
 
         editWindow->setWindowTitle("Edit Class");
         editWindow->showDialog();
@@ -171,13 +186,17 @@ void MainWindow::cellContextMenu(QPoint point)
                                                   clickedItem->column(), \
                                                   clickedItem, this->m_pTableWidget) );
     } else if ( clickedAction == viewAction ) {
-        QString displayedMessage = clickedItem->data(Qt::UserRole).toList().at(MainTableOptions::ClassNotes).toString();
+        QString displayedMessage = \
+                clickedItem->data(Qt::UserRole).toList().at(MainTableOptions::ClassNotes).toString();
 
         QMessageBox::information( this, "Class Notes", displayedMessage );
     } else if ( clickedAction == copyAction ) {
         copyClass();
     } else if ( clickedAction == pasteAction ) {
         pasteClass();
+    } else if ( highlighterActions.contains(clickedAction) ) {
+        highlightClass( clickedItem->row(), clickedItem->column(), \
+                        clickedAction->text() );
     }
 }
 
@@ -346,6 +365,12 @@ void MainWindow::pasteClass()
     else
         this->m_undoStack->push( new CommandClassPaste(this->m_pTableWidget->currentRow(), \
                                                        this->m_pTableWidget->currentColumn(), \
+                                                       this->m_pTableWidget) );
+}
+
+void MainWindow::highlightClass(int row, int column, QString highlighter)
+{
+    this->m_undoStack->push( new CommandClassHighlight(row, column, highlighter, \
                                                        this->m_pTableWidget) );
 }
 

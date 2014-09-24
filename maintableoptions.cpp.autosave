@@ -101,9 +101,9 @@ QMenu *MainTableOptions::getHighlightMenu() const
 
 void MainTableOptions::makeHighlightMenu() const
 {
-    this->highlightMenu->addAction("&None");
-    this->highlightMenu->addAction("Highlight &1");
-    this->highlightMenu->addAction("Highlight &2");
-    this->highlightMenu->addAction("Highlight &3");
-    this->highlightMenu->addAction("Highlight &4");
+    this->highlightMenu->addAction("None");
+    this->highlightMenu->addAction("Highlight 1");
+    this->highlightMenu->addAction("Highlight 2");
+    this->highlightMenu->addAction("Highlight 3");
+    this->highlightMenu->addAction("Highlight 4");
 }
