@@ -17,6 +17,8 @@ CommandClassHighlight::CommandClassHighlight(int row, int col, QString highlight
 
 CommandClassHighlight::~CommandClassHighlight()
 {
+    delete this->newHighlight;
+    delete this->oldHighlight;
 }
 
 void CommandClassHighlight::undo()

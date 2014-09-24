@@ -14,7 +14,7 @@ CommandClassPaste::CommandClassPaste(int currentRow, int currentColumn, \
     int section = oldData.at(MainTableOptions::ClassSection).toInt();
     section += tableWidget->getCopiedItemNumber();
 
-    oldData.replace(2, QString("%1").arg(section));
+    oldData.replace(MainTableOptions::ClassSection, QString("%1").arg(section));
     QVariant *newData = new QVariant((QVariant)oldData);
 
     QString gradeString = tableWidget->getCopiedItem()->text().split("\n").at(MainTableOptions::ClassGrade);
