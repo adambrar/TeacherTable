@@ -10,7 +10,7 @@ CommandClassHighlight::CommandClassHighlight(int row, int col, QString highlight
     this->m_tableWidget = m_ptableWidget;
 
     this->oldHighlight = new QString( m_ptableWidget->item(row,col)->data(Qt::UserRole).\
-            toStringList().at(MainTableOptions::ClassHighlight) );
+                                      toStringList().at(MainTableOptions::ClassHighlight) );
 
     this->newHighlight = new QString( highlighter );
 }
@@ -23,10 +23,18 @@ CommandClassHighlight::~CommandClassHighlight()
 
 void CommandClassHighlight::undo()
 {
+    QStringList oldData = this->m_tableWidget->item(row,col)->data(Qt::UserRole).toStringList();
 
+    oldData.replace(MainTableOptions::ClassHighlight, *this->oldHighlight);
+
+    this->m_tableWidget->item(row,col)->setData(Qt::UserRole, (QVariant)oldData);
 }
 
 void CommandClassHighlight::redo()
 {
+    QStringList oldData = this->m_tableWidget->item(row,col)->data(Qt::UserRole).toStringList();
 
+    oldData.replace(MainTableOptions::ClassHighlight, *this->newHighlight);
+
+    this->m_tableWidget->item(row,col)->setData(Qt::UserRole, (QVariant)oldData);
 }

@@ -90,6 +90,7 @@ QTableWidgetItem* NewClassDialog::createClass(QString name, QString gradeString,
     newData->append(QVariant(notes));
     newData->append(QVariant(nRow));
     newData->append(QVariant(nColumn));
+    newData->append((QVariant)QString("None"));
 
     QVariant *dataToAdd = new QVariant(*newData);
 

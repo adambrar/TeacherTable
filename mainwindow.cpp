@@ -132,16 +132,16 @@ void MainWindow::cellContextMenu(QPoint point)
     QList<QAction *> highlighterActions;
 
     //if on inaccessible item return
-    if( this->m_pTableWidget->visualColumn(clickedItem->column()) < \
-                                            this->m_pTableWidget->BlackoutColumns() )
-    {
-        return;
-    }
-    //if able to copy offer action
-    else if( clickedItem->text() == QString(" \n \n ") & \
-             this->m_pTableWidget->getCopiedItem()->text() != QString(" \n \n ") )
-    {
-        pasteAction = menu.addAction("&Paste");
+    if( this->m_pTableWidget->visualColumn(clickedItem->column()) < this->m_pTableWidget->BlackoutColumns() || \
+            clickedItem->text() == QString(" \n \n ") )
+    {   
+        //unless able to paste then offer paste action
+        if( this->m_pTableWidget->getCopiedItem()->text() != QString(" \n \n ") )
+        {
+            pasteAction = menu.addAction("&Paste");
+        } else {
+            return;
+        }
 
     //otherwise offer all actions
     } else {
@@ -195,8 +195,9 @@ void MainWindow::cellContextMenu(QPoint point)
     } else if ( clickedAction == pasteAction ) {
         pasteClass();
     } else if ( highlighterActions.contains(clickedAction) ) {
+        QString actionText = clickedAction->text();
         highlightClass( clickedItem->row(), clickedItem->column(), \
-                        clickedAction->text() );
+                        actionText );
     }
 }
 

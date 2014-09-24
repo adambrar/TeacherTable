@@ -31,7 +31,7 @@ SOURCES += main.cpp\
     rowgradesdialog.cpp \
     maintableoptions.cpp \
     commandclasshighlight.cpp \
-    highlihgtitemdelegate.cpp
+    highlightitemdelegate.cpp
 
 HEADERS  += \
     commandclassadd.h \
@@ -52,4 +52,4 @@ HEADERS  += \
     rowgradesdialog.h \
     maintableoptions.h \
     commandclasshighlight.h \
-    highlihgtitemdelegate.h
+    highlightitemdelegate.h

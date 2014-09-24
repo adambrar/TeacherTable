@@ -1,4 +1,5 @@
 #include "commandteacheradd.h"
+#include "highlightitemdelegate.h"
 
 #include <QTableWidget>
 #include <QHeaderView>
@@ -41,6 +42,8 @@ void CommandTeacherAdd::redo()
     foreach( QString name, *teacherNames )
     {
         m_tableWidget->setColumnCount(m_tableWidget->columnCount() + 1);
+        m_tableWidget->setItemDelegateForColumn( m_tableWidget->columnCount()-1, \
+                                                new HighlightItemDelegate(m_tableWidget) );
         QString formattedName;
 
         foreach( const QChar c, name )
