@@ -28,6 +28,9 @@ void CommandClassHighlight::undo()
     oldData.replace(MainTableOptions::ClassHighlight, *this->oldHighlight);
 
     this->m_tableWidget->item(row,col)->setData(Qt::UserRole, (QVariant)oldData);
+
+    this->m_tableWidget->hide();
+    this->m_tableWidget->show();
 }
 
 void CommandClassHighlight::redo()
@@ -37,4 +40,7 @@ void CommandClassHighlight::redo()
     oldData.replace(MainTableOptions::ClassHighlight, *this->newHighlight);
 
     this->m_tableWidget->item(row,col)->setData(Qt::UserRole, (QVariant)oldData);
+
+    this->m_tableWidget->hide();
+    this->m_tableWidget->show();
 }

@@ -17,6 +17,7 @@ RowGradesDialog::RowGradesDialog(MainTableWidget *m_pTableWidget, int clickedRow
 
     QList<float> count = countGrades();
 
+    f_layout->addRow( new QLabel(QString("Grade totals for block %1").arg(clickedRow+1)) );
     f_layout->addRow( new QLabel( QString("Grade 8: ") ), new QLabel(QString("%1").arg(count.at(0)) ) );
     f_layout->addRow( new QLabel( QString("Grade 9: ") ), new QLabel(QString("%1").arg(count.at(1)) ) );
     f_layout->addRow( new QLabel( QString("Grade 10: ") ), new QLabel(QString("%1").arg(count.at(2)) ) );
@@ -49,12 +50,12 @@ QList<float> RowGradesDialog::countGrades()
     {
         QTableWidgetItem *currentItem = this->m_tableWidget->item(this->row, i);
 
-        if(currentItem->data(Qt::UserRole).toStringList().isEmpty())
+        if(currentItem->data(Qt::UserRole).toStringList().size() <= 1)
             continue;
 
         QString grades = currentItem->data(Qt::UserRole).toStringList().at(MainTableOptions::ClassGrade);
         float valueAdded = 1;
-        if(grades.size() > 2)
+        if(grades.size() > 3)
             valueAdded = 0.5;
 
         if(grades.contains("8"))

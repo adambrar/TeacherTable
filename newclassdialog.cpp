@@ -21,7 +21,8 @@ NewClassDialog::NewClassDialog(int row, int column, QString name, \
 
     this->classNameInput = new QLineEdit;
     this->classNameInput->setMaxLength(7);
-    this->classNameInput->setText(name);
+    if(name != "=======")
+        this->classNameInput->setText(name);
 
     this->classSectionInput = new QLineEdit;
     this->classSectionInput->setValidator( new QIntValidator(1, 9, this) );

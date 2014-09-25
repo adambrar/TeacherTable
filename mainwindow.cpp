@@ -71,6 +71,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->m_pTableWidget->setCopiedItem( new QTableWidgetItem(QString(" \n \n ")) );
     this->m_pTableWidget->setFocus();
+
+    this->m_saveFileName = new QString("");
 }
 
 MainWindow::~MainWindow()
@@ -84,14 +86,17 @@ void MainWindow::createMenu()
     QMenu *fileMenu = menuBar()->addMenu("&File");
     QMenu *editMenu = menuBar()->addMenu("&Edit");
     QMenu *viewMenu = menuBar()->addMenu("&View");
-    menuBar()->addMenu("&Help");
+    QMenu *helpMenu = menuBar()->addMenu("&Help");
 
     this->m_undoStack = new QUndoStack(this);
 
     fileMenu->addAction("&New...", this, SLOT(createNewTable()), QKeySequence::New);
+    fileMenu->addSeparator();
     fileMenu->addAction("&Save...", this, SLOT(saveToFile()), QKeySequence::Save);
+    fileMenu->addAction("Save &As...", this, SLOT(saveAsToFile()), QKeySequence::SaveAs);
     fileMenu->addAction("&Open...", this, SLOT(loadFromFile()), QKeySequence::Open);
-    fileMenu->addAction("&Close...", this, SLOT(closeWindow()), QKeySequence::Close);
+    fileMenu->addSeparator();
+    fileMenu->addAction("&Quit...", this, SLOT(closeWindow()), QKeySequence::Close);
 
     QAction *undoAction = m_undoStack->createUndoAction( this );
     QAction *redoAction = m_undoStack->createRedoAction( this );
@@ -100,23 +105,19 @@ void MainWindow::createMenu()
 
     editMenu->addAction( undoAction );
     editMenu->addAction( redoAction );
-    editMenu->addAction( "Delete Class", this, SLOT(deleteClass()), QKeySequence::Delete );
-    editMenu->addAction( "Copy Class", this, SLOT(copyClass()), QKeySequence::Copy );
-    editMenu->addAction( "Paste Class", this, SLOT(pasteClass()), QKeySequence::Paste );
+    editMenu->addSeparator();
+    editMenu->addAction( "&Edit Class", this, SLOT(editClassDialog()) );
+    editMenu->addAction( "&Copy Class", this, SLOT(copyClass()), QKeySequence::Copy );
+    editMenu->addAction( "&Paste Class", this, SLOT(pasteClass()), QKeySequence::Paste );
+    editMenu->addSeparator();
+    editMenu->addAction( "&Delete Class", this, SLOT(deleteClass()), QKeySequence::Delete );
 
-    viewMenu->addAction( "Undo Stack", this, SLOT(showUndoStack()) );
+    viewMenu->addAction( "&Show Notes", this, SLOT(showUndoStack()) );
 
-}
+    helpMenu->addAction( "&Instructions", this, SLOT(showHelp()), QKeySequence::HelpContents );
+    editMenu->addSeparator();
+    helpMenu->addAction( "&About", this, SLOT(showQtHelp()) );
 
-void MainWindow::showUndoStack()
-{
-    if( this->m_undoView == 0 )
-    {
-        this->m_undoView = new QUndoView( m_undoStack );
-        this->m_undoView->setWindowTitle( "Undo Stack");
-        this->m_undoView->setAttribute( Qt::WA_QuitOnClose, false );
-    }
-    this->m_undoView->show();
 }
 
 void MainWindow::cellContextMenu(QPoint point)
@@ -153,43 +154,28 @@ void MainWindow::cellContextMenu(QPoint point)
         foreach(QAction *action, highlighterActions)
             highlightMenu->addAction(action);
 
-        viewAction = menu.addAction("&Notes");
-        editAction = menu.addAction("&Edit");
         menu.addMenu(highlightMenu);
+        menu.addSeparator();
+        viewAction = menu.addAction("&Notes");
+        menu.addSeparator();
+        editAction = menu.addAction("&Edit");
         copyAction = menu.addAction("&Copy");
         pasteAction = menu.addAction("&Paste");
+        menu.addSeparator();
         deleteAction = menu.addAction("&Delete");
     }
 
     QAction *clickedAction = menu.exec( QCursor::pos() );
 
     if ( clickedAction == editAction ) {
-        QList<QVariant> data = clickedItem->data(Qt::UserRole).toList();
-
-        NewClassDialog *editWindow = \
-                new NewClassDialog(clickedItem->row(), \
-                                   clickedItem->column(), \
-                                   data.at(MainTableOptions::ClassName).toString(), \
-                                   data.at(MainTableOptions::ClassGrade).toString(), \
-                                   data.at(MainTableOptions::ClassSection).toString(), \
-                                   data.at(MainTableOptions::ClassNotes).toString(), \
-                                   this);
-
-        connect( editWindow , SIGNAL(newClassInput(QTableWidgetItem*, int, int)), \
-                 this, SLOT(editClass(QTableWidgetItem*, int, int)) );
-
-        editWindow->setWindowTitle("Edit Class");
-        editWindow->showDialog();
+        editClassDialog();
 
     } else if ( clickedAction == deleteAction ) {
         this->m_undoStack->push( new CommandClassDelete(clickedItem->row(), \
                                                   clickedItem->column(), \
                                                   clickedItem, this->m_pTableWidget) );
     } else if ( clickedAction == viewAction ) {
-        QString displayedMessage = \
-                clickedItem->data(Qt::UserRole).toList().at(MainTableOptions::ClassNotes).toString();
-
-        QMessageBox::information( this, "Class Notes", displayedMessage );
+        showClass();
     } else if ( clickedAction == copyAction ) {
         copyClass();
     } else if ( clickedAction == pasteAction ) {
@@ -326,11 +312,14 @@ void MainWindow::setClass(QTableWidgetItem *item, int nRow, int nColumn)
 
 void MainWindow::deleteClass()
 {
-    this->m_undoStack->push( new CommandClassDelete( \
+    if(this->m_pTableWidget->currentItem()->data(Qt::UserRole).toStringList().size() > 1)
+    {
+        this->m_undoStack->push( new CommandClassDelete( \
                            this->m_pTableWidget->currentRow(), \
                            this->m_pTableWidget->currentColumn(), \
                            this->m_pTableWidget->currentItem(), \
                            this->m_pTableWidget) );
+    }
 }
 
 void MainWindow::moveClass(QTableWidgetItem *movedItem, \
@@ -347,6 +336,30 @@ void MainWindow::moveClass(QTableWidgetItem *movedItem, \
 
 }
 
+void MainWindow::editClassDialog()
+{
+    QTableWidgetItem *clickedItem = this->m_pTableWidget->currentItem();
+    if( clickedItem->data(Qt::UserRole).toStringList().size() <= 1)
+        return;
+
+    QList<QVariant> data = clickedItem->data(Qt::UserRole).toList();
+
+    NewClassDialog *editWindow = \
+            new NewClassDialog(clickedItem->row(), \
+                               clickedItem->column(), \
+                               data.at(MainTableOptions::ClassName).toString(), \
+                               data.at(MainTableOptions::ClassGrade).toString(), \
+                               data.at(MainTableOptions::ClassSection).toString(), \
+                               data.at(MainTableOptions::ClassNotes).toString(), \
+                               this);
+
+    connect( editWindow , SIGNAL(newClassInput(QTableWidgetItem*, int, int)), \
+             this, SLOT(editClass(QTableWidgetItem*, int, int)) );
+
+    editWindow->setWindowTitle("Edit Class");
+    editWindow->showDialog();
+}
+
 void MainWindow::editClass(QTableWidgetItem *item, int nRow, int nColumn)
 {
     QTableWidgetItem *newItem = new QTableWidgetItem(*item);
@@ -355,6 +368,9 @@ void MainWindow::editClass(QTableWidgetItem *item, int nRow, int nColumn)
 
 void MainWindow::copyClass()
 {
+    if( this->m_pTableWidget->currentItem()->data(Qt::UserRole).toStringList().size() <= 1)
+        return;
+
     this->m_pTableWidget->resetCopiedItemNumber();
     this->m_pTableWidget->setCopiedItem( this->m_pTableWidget->currentItem() );
 }
@@ -375,11 +391,34 @@ void MainWindow::highlightClass(int row, int column, QString highlighter)
                                                        this->m_pTableWidget) );
 }
 
+void MainWindow::showClass()
+{
+    QTableWidgetItem *clickedItem = this->m_pTableWidget->currentItem();
+
+    if( clickedItem->data(Qt::UserRole).toStringList().size() <= 1)
+        return;
+
+    QString displayedMessage = \
+            clickedItem->data(Qt::UserRole).toList().at(MainTableOptions::ClassNotes).toString();
+
+    QMessageBox::information( this, "Class Notes", displayedMessage );
+}
+
+void MainWindow::showHelp()
+{
+    QMessageBox::about(this, "Instructions", "This is where instructions will be.");
+}
+
+void MainWindow::showQtHelp()
+{
+    QMessageBox::aboutQt(this, "AboutQt");
+}
+
 void MainWindow::createNewTable()
 {
     this->m_pTableWidget->setColumnCount(1);
     this->m_pTableWidget->HTableHeader().clear();
-    this->m_pTableWidget->HTableHeader()<<"A\nd\nd\n \nT\ne\na\nc\nh\ne\nr";
+    this->m_pTableWidget->HTableHeader()<<"A\nD\nD\n \nT\nE\nA\nC\nH\nE\nR";
 
     this->m_pTableWidget->insertInstructions(this->m_pTableWidget);
 
@@ -390,6 +429,17 @@ void MainWindow::createNewTable()
     this->m_undoStack->clear();
 }
 
+void MainWindow::showUndoStack()
+{
+    if( this->m_undoView == 0 )
+    {
+        this->m_undoView = new QUndoView( m_undoStack );
+        this->m_undoView->setWindowTitle( "Undo Stack");
+        this->m_undoView->setAttribute( Qt::WA_QuitOnClose, false );
+    }
+    this->m_undoView->show();
+}
+
 QSize MainWindow::getWindowSize()
 {
     return this->m_pTableWidget->getTableSize(this->m_pTableWidget);
@@ -397,19 +447,20 @@ QSize MainWindow::getWindowSize()
 
 void MainWindow::saveToFile()
 {
-    QString fileName = QFileDialog::getSaveFileName(this,
-        QString("Save TimeTable"), "",
-        QString("TimeTable(*.ttl);;All Files (*)"));
+    if(this->m_saveFileName->size() <= 1)
+        this->m_saveFileName = new QString( QFileDialog::getSaveFileName( \
+                                                this, QString("Save TimeTable"), \
+                                                "", QString("TimeTable(*.ttl);;All Files (*)") ) );
 
-    if( !fileName.endsWith(".ttl") )
-        fileName.append(QString(".ttl"));
+    if( !this->m_saveFileName->endsWith(".ttl") )
+        this->m_saveFileName->append(QString(".ttl"));
 
-    if (fileName.isEmpty())
+    if (this->m_saveFileName->isEmpty())
         return;
     else {
-        QFile file(fileName);
+        QFile file(*this->m_saveFileName);
         if (!file.open(QIODevice::WriteOnly)) {
-            QMessageBox::information(this, tr("Unable to open file"),
+            QMessageBox::information(this, tr("Unable to open file"), \
                 file.errorString());
             return;
         }
@@ -425,9 +476,9 @@ void MainWindow::saveToFile()
         out << this->m_HTableHeader << this->m_VTableHeader;
 
         //table items by row then column
-        for (int i=0; i<numRows; ++i)
+        for (int i=0; i<numRows; i++)
         {
-            for (int j=0; j<numCols; j++)
+            for (int j=1; j<numCols; j++)
             {
               this->m_pTableWidget->item(i,j)->write(out);
             }
@@ -437,10 +488,18 @@ void MainWindow::saveToFile()
     }
 }
 
+void MainWindow::saveAsToFile()
+{
+    this->m_saveFileName = new QString( QFileDialog::getSaveFileName( \
+                                            this, QString("Save TimeTable"), \
+                                            "", QString("TimeTable(*.ttl);;All Files (*)") ) );
+    saveToFile();
+}
+
 void MainWindow::loadFromFile()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
-        tr("Open TimeTable"), "",
+        tr("Open TimeTable"), *this->m_saveFileName,
         tr("TimeTable (*.ttl);;All Files (*)"));
 
     if (fileName.isEmpty())
@@ -473,12 +532,6 @@ void MainWindow::loadFromFile()
             newItem->setFlags(newItem->flags() & ~Qt::ItemIsEnabled & ~Qt::ItemIsDropEnabled);
         }
 
-
-        for(int i=0; i < this->m_pTableWidget->columnCount() - 1; i++)
-        {
-            this->m_pTableWidget->horizontalHeader()->swapSections(i, i+1);
-        }
-
         QStringList inHTableHeader, inVTableHeader;
 
         in >> inHTableHeader >> inVTableHeader;
@@ -488,24 +541,30 @@ void MainWindow::loadFromFile()
         this->m_pTableWidget->setHorizontalHeaderLabels(this->m_HTableHeader);
         this->m_pTableWidget->setVerticalHeaderLabels(this->m_VTableHeader);
 
-        for (int i = 0; i < numRows; ++i)
+        for (int i = 0; i < numRows; i++)
         {
-           for (int j = 0; j < numCols; j++)
+           for (int j = 1; j < numCols; j++)
            {
                QTableWidgetItem *item = new QTableWidgetItem;
                item->read(in);
                this->m_pTableWidget->setItem(i, j, item);
-           }
-        }
 
-        int lastColumn = 0;
+               if(item->data(Qt::UserRole).toStringList().size() <= 1)
+               {
+                   item->setText("wwwwwww");
+                   this->m_pTableWidget->resizeColumnToContents(j);
+                   item->setText(" \n \n ");
+               }
+           }
+           this->m_pTableWidget->resizeRowToContents(i);
+        }
 
         for (int row = 0; row < m_pTableWidget->rowCount(); row++)
         {
-            QTableWidgetItem *newItem = this->m_pTableWidget->item(row, lastColumn)->clone();
+            QTableWidgetItem *newItem = this->m_pTableWidget->item(row, 0)->clone();
             newItem->setFlags(newItem->flags() & ~Qt::ItemIsSelectable & ~Qt::ItemIsDropEnabled \
                               & ~Qt::ItemIsEnabled & ~Qt::ItemIsDragEnabled);
-            this->m_pTableWidget->setItem(row, lastColumn, newItem);
+            this->m_pTableWidget->setItem(row, 0, newItem);
         }
 
         file.close();

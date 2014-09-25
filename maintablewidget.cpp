@@ -70,7 +70,7 @@ void MainTableWidget::initTableWidget( QTableWidget *m_pTableWidget )
     m_pTableWidget->setColumnCount(1);
 
     m_HTableHeader.clear();
-    m_HTableHeader<<"A\nd\nd\n \nT\ne\na\nc\nh\ne\nr";
+    m_HTableHeader<<"A\nD\nD\n \nT\nE\nA\nC\nH\nE\nR";
     m_VTableHeader.clear();
     m_VTableHeader<<"  A "<<"  B "<<"  C "<<"  D "<<"  E "<<"  F "<<"  G "<<"  H "<<" "<<" "<<" ";
     m_pTableWidget->setHorizontalHeaderLabels(m_HTableHeader);
@@ -107,7 +107,7 @@ void MainTableWidget::initTableWidget( QTableWidget *m_pTableWidget )
 void MainTableWidget::insertInstructions( QTableWidget *m_pTableWidget )
 {
     //insert data
-    int lastCol = m_pTableWidget->columnCount() - 1;
+    int addCol = 0;
 
     for (int row = 0; row < m_pTableWidget->rowCount(); row++)
     {
@@ -118,22 +118,22 @@ void MainTableWidget::insertInstructions( QTableWidget *m_pTableWidget )
         newItem->setFlags(newItem->flags() & ~Qt::ItemIsEnabled & ~Qt::ItemIsDropEnabled);
         newItem->setData(Qt::UserRole, (QVariant)QString("0"));
 
-        m_pTableWidget->setItem(row, lastCol, newItem);
+        m_pTableWidget->setItem(row, addCol, newItem);
 
         m_pTableWidget->resizeRowToContents(row);
     }
 
 
-    m_pTableWidget->item(0,lastCol)->setText("Double\nclick\ncells");
-    m_pTableWidget->item(1,lastCol)->setText("to\ncreate\nnew");
-    m_pTableWidget->item(2,lastCol)->setText("classes.\n \nClick");
-    m_pTableWidget->item(3,lastCol)->setText("New\nTeacher\nto");
-    m_pTableWidget->item(4,lastCol)->setText("add\nteachers.\n ");
-    m_pTableWidget->item(5,lastCol)->setText("Drag\nand\nDrop");
-    m_pTableWidget->item(6,lastCol)->setText("wwwwwww");
+    m_pTableWidget->item(0,addCol)->setText("Double\nclick\ncells to");
+    m_pTableWidget->item(1,addCol)->setText("create new\nclasses.\nClick");
+    m_pTableWidget->item(2,addCol)->setText("Add Teacher\nto add\nteachers.");
+    m_pTableWidget->item(3,addCol)->setText("Drag and\ndrop\ncells/columns");
+    m_pTableWidget->item(4,addCol)->setText("to reorder.\nRight\nclick to");
+    m_pTableWidget->item(5,addCol)->setText("access\noptions.\nClick");
+    m_pTableWidget->item(6,addCol)->setText("block\nheaders\nto get");
+    m_pTableWidget->item(7,addCol)->setText("grade\ntotals\nby row.");
 
-    m_pTableWidget->resizeColumnToContents(lastCol);
-    m_pTableWidget->item(6,lastCol)->setText("cells\nto\nreorder");
+    m_pTableWidget->resizeColumnToContents(addCol);
 
 }
 

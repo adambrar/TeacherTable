@@ -27,13 +27,17 @@ CommandClassMove::~CommandClassMove()
 
 void CommandClassMove::undo()
 {
-    m_tableWidget->setItem( fromRow, fromCol, new QTableWidgetItem(*m_toClass) );
-    m_fromClass->setData( Qt::UserRole, QVariant(0) );
-    m_tableWidget->setItem( toRow, toCol, new QTableWidgetItem(*m_fromClass) );
+    this->m_tableWidget->setItem( fromRow, fromCol, new QTableWidgetItem(*m_toClass) );
+    this->m_tableWidget->setItem( toRow, toCol, new QTableWidgetItem(*m_fromClass) );
+    this->m_tableWidget->hide();
+    this->m_tableWidget->show();
 }
 
 void CommandClassMove::redo()
 {
-    m_tableWidget->setItem( toRow, toCol, new QTableWidgetItem(*m_toClass) );
-    m_tableWidget->setItem( fromRow, fromCol, new QTableWidgetItem(" \n \n ") );
+    this->m_tableWidget->setItem( toRow, toCol, new QTableWidgetItem(*m_toClass) );
+    this->m_tableWidget->setItem( fromRow, fromCol, new QTableWidgetItem(" \n \n ") );
+    this->m_tableWidget->item(fromRow, fromCol)->setData(Qt::UserRole, (QVariant)QString("1"));
+    this->m_tableWidget->hide();
+    this->m_tableWidget->show();
 }

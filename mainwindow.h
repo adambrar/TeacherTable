@@ -35,6 +35,7 @@ private slots:
     void cellDoubleClicked(int, int);
 
     void setClass(QTableWidgetItem*, int, int);
+    void editClassDialog();
     void editClass(QTableWidgetItem*, int, int);
     void deleteClass();
     void moveClass(QTableWidgetItem*, int toRow, int toCol, \
@@ -42,6 +43,7 @@ private slots:
     void copyClass();
     void pasteClass();
     void highlightClass(int, int, QString);
+    void showClass();
 
     void createNewTeachers(QTextEdit*);
     void editTeacher(QString, int);
@@ -53,7 +55,11 @@ private slots:
     void showUndoStack();
 
     void saveToFile();
+    void saveAsToFile();
     void loadFromFile();
+
+    void showHelp();
+    void showQtHelp();
 
     void closeWindow();
 
@@ -66,6 +72,8 @@ private:
 
     QStringList m_HTableHeader;
     QStringList m_VTableHeader;
+
+    QString *m_saveFileName;
 };
 
 #endif // MAINWINDOW_H
