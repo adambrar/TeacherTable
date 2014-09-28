@@ -32,6 +32,7 @@
 #include <QUndoView>
 #include <QFile>
 #include <QFileDialog>
+#include <QStringList>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
@@ -112,7 +113,7 @@ void MainWindow::createMenu()
     editMenu->addSeparator();
     editMenu->addAction( "&Delete Class", this, SLOT(deleteClass()), QKeySequence::Delete );
 
-    viewMenu->addAction( "&Show Notes", this, SLOT(showUndoStack()) );
+    viewMenu->addAction( "&Show Notes", this, SLOT(showClass()) );
 
     helpMenu->addAction( "&Instructions", this, SLOT(showHelp()), QKeySequence::HelpContents );
     editMenu->addSeparator();
@@ -312,8 +313,11 @@ void MainWindow::setClass(QTableWidgetItem *item, int nRow, int nColumn)
 
 void MainWindow::deleteClass()
 {
-    if(this->m_pTableWidget->currentItem()->data(Qt::UserRole).toStringList().size() > 1)
+    if(this->m_pTableWidget->currentColumn() < 1 || \
+            this->m_pTableWidget->currentItem()->data(Qt::UserRole).toStringList().size() <= 1)
     {
+        return;
+    } else {
         this->m_undoStack->push( new CommandClassDelete( \
                            this->m_pTableWidget->currentRow(), \
                            this->m_pTableWidget->currentColumn(), \
@@ -338,8 +342,12 @@ void MainWindow::moveClass(QTableWidgetItem *movedItem, \
 
 void MainWindow::editClassDialog()
 {
+    if(this->m_pTableWidget->currentColumn() < 1)
+        return;
+
     QTableWidgetItem *clickedItem = this->m_pTableWidget->currentItem();
-    if( clickedItem->data(Qt::UserRole).toStringList().size() <= 1)
+
+    if(clickedItem->data(Qt::UserRole).toStringList().size() <= 1)
         return;
 
     QList<QVariant> data = clickedItem->data(Qt::UserRole).toList();
@@ -368,7 +376,8 @@ void MainWindow::editClass(QTableWidgetItem *item, int nRow, int nColumn)
 
 void MainWindow::copyClass()
 {
-    if( this->m_pTableWidget->currentItem()->data(Qt::UserRole).toStringList().size() <= 1)
+    if(this->m_pTableWidget->currentColumn() < 1 || \
+            this->m_pTableWidget->currentItem()->data(Qt::UserRole).toStringList().size() <= 1)
         return;
 
     this->m_pTableWidget->resetCopiedItemNumber();
@@ -377,7 +386,8 @@ void MainWindow::copyClass()
 
 void MainWindow::pasteClass()
 {
-    if(this->m_pTableWidget->getCopiedItem()->text() == " \n \n ")
+    if(this->m_pTableWidget->currentColumn() < 1 || \
+            this->m_pTableWidget->getCopiedItem()->text() == " \n \n ")
         return;
     else
         this->m_undoStack->push( new CommandClassPaste(this->m_pTableWidget->currentRow(), \
@@ -393,6 +403,9 @@ void MainWindow::highlightClass(int row, int column, QString highlighter)
 
 void MainWindow::showClass()
 {
+    if(this->m_pTableWidget->currentColumn() < 1)
+        return;
+
     QTableWidgetItem *clickedItem = this->m_pTableWidget->currentItem();
 
     if( clickedItem->data(Qt::UserRole).toStringList().size() <= 1)
@@ -473,14 +486,24 @@ void MainWindow::saveToFile()
         qint32 numCols = this->m_pTableWidget->columnCount();
         out << numRows << numCols;
 
-        out << this->m_HTableHeader << this->m_VTableHeader;
+        QStringList visualhHeaders;
+
+        for(int i=0; i<numCols; i++)
+        {
+            int logicalCol = this->m_pTableWidget->horizontalHeader()->logicalIndex(i);
+            visualhHeaders.append(this->m_pTableWidget->horizontalHeaderItem(logicalCol)->text());
+        }
+
+        out << visualhHeaders << this->m_VTableHeader;
 
         //table items by row then column
         for (int i=0; i<numRows; i++)
         {
+            int visualRow = this->m_pTableWidget->verticalHeader()->logicalIndex(i);
             for (int j=1; j<numCols; j++)
             {
-              this->m_pTableWidget->item(i,j)->write(out);
+                int visualCol = this->m_pTableWidget->horizontalHeader()->logicalIndex(j);
+                this->m_pTableWidget->item(visualRow,visualCol)->write(out);
             }
         }
 

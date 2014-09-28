@@ -29,8 +29,10 @@ void CommandClassMove::undo()
 {
     this->m_tableWidget->setItem( fromRow, fromCol, new QTableWidgetItem(*m_toClass) );
     this->m_tableWidget->setItem( toRow, toCol, new QTableWidgetItem(*m_fromClass) );
+
     this->m_tableWidget->hide();
     this->m_tableWidget->show();
+    this->m_tableWidget->setCurrentCell(fromRow,fromCol);
 }
 
 void CommandClassMove::redo()
@@ -38,6 +40,8 @@ void CommandClassMove::redo()
     this->m_tableWidget->setItem( toRow, toCol, new QTableWidgetItem(*m_toClass) );
     this->m_tableWidget->setItem( fromRow, fromCol, new QTableWidgetItem(" \n \n ") );
     this->m_tableWidget->item(fromRow, fromCol)->setData(Qt::UserRole, (QVariant)QString("1"));
+
     this->m_tableWidget->hide();
     this->m_tableWidget->show();
+    this->m_tableWidget->setCurrentCell(toRow,toCol);
 }

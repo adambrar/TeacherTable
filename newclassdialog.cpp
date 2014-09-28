@@ -94,8 +94,16 @@ QTableWidgetItem* NewClassDialog::createClass(QString name, QString gradeString,
     newData->append((QVariant)QString("None"));
 
     QVariant *dataToAdd = new QVariant(*newData);
+    QTableWidgetItem *newItem;
 
-    QTableWidgetItem *newItem = new QTableWidgetItem( QString("%1\n%2\n00%3").arg(name).arg(gradeString).arg(section) );
+    if(notes == "")
+    {
+        newItem = new QTableWidgetItem( \
+                QString("%1\n%2\n00%3").arg(name).arg(gradeString).arg(section) );
+    } else {
+        newItem = new QTableWidgetItem( \
+                QString("%1\n%2\n** 00%3 **").arg(name).arg(gradeString).arg(section) );
+    }
     newItem->setTextAlignment(Qt::AlignCenter);
     newItem->setData(Qt::UserRole, *dataToAdd);
 

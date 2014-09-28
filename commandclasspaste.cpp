@@ -17,13 +17,22 @@ CommandClassPaste::CommandClassPaste(int currentRow, int currentColumn, \
     oldData.replace(MainTableOptions::ClassSection, QString("%1").arg(section));
     QVariant *newData = new QVariant((QVariant)oldData);
 
-    QString gradeString = tableWidget->getCopiedItem()->text().split("\n").at(MainTableOptions::ClassGrade);
+    QString gradeString = tableWidget->getCopiedItem()->text().split("\n"). \
+                                                            at(MainTableOptions::ClassGrade);
 
     this->m_toClass = new QTableWidgetItem( *tableWidget->getCopiedItem() );
     m_toClass->setData(Qt::UserRole, *newData);
-    m_toClass->setText( QString("%1\n%2\n00%3").arg(oldData.at(MainTableOptions::ClassName)). \
+
+    if(oldData.at(MainTableOptions::ClassNotes) == "")
+    {
+        m_toClass->setText( QString("%1\n%2\n00%3").arg(oldData.at(MainTableOptions::ClassName)). \
                                                 arg(gradeString). \
                                                 arg(oldData.at(MainTableOptions::ClassSection)) );
+    } else {
+        m_toClass->setText( QString("%1\n%2\n** 00%3 **").arg(oldData.at(MainTableOptions::ClassName)). \
+                                                arg(gradeString). \
+                                                arg(oldData.at(MainTableOptions::ClassSection)) );
+    }
 
     this->toRow = currentRow;
     this->toCol = currentColumn;
