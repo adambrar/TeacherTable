@@ -5,12 +5,14 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += xlsx
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = ATeachers
 TEMPLATE = app
 
+include(qtxlsx/src/xlsx/qtxlsx.pri)
 
 SOURCES += main.cpp\
     commandclassadd.cpp \
@@ -31,7 +33,8 @@ SOURCES += main.cpp\
     rowgradesdialog.cpp \
     maintableoptions.cpp \
     commandclasshighlight.cpp \
-    highlightitemdelegate.cpp
+    highlightitemdelegate.cpp \
+    helpdialog.cpp
 
 HEADERS  += \
     commandclassadd.h \
@@ -52,4 +55,5 @@ HEADERS  += \
     rowgradesdialog.h \
     maintableoptions.h \
     commandclasshighlight.h \
-    highlightitemdelegate.h
+    highlightitemdelegate.h \
+    helpdialog.h

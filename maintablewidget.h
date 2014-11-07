@@ -24,7 +24,7 @@ public:
 
     int numBlocks() { return 8; }
     int numExtraBlocks() { return 2; }
-    QSize getTableSize( QTableWidget* );
+    QSize getTableSize();
 
     QTableWidgetItem* emptyCell() const;
 

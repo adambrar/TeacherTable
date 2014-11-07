@@ -17,7 +17,7 @@ RowGradesDialog::RowGradesDialog(MainTableWidget *m_pTableWidget, int clickedRow
 
     QList<float> count = countGrades();
 
-    f_layout->addRow( new QLabel(QString("Grade totals for block %1").arg(clickedRow+1)) );
+    f_layout->addRow( new QLabel(QString("Grade totals for Block %1").arg(clickedRow+1)) );
     f_layout->addRow( new QLabel( QString("Grade 8: ") ), new QLabel(QString("%1").arg(count.at(0)) ) );
     f_layout->addRow( new QLabel( QString("Grade 9: ") ), new QLabel(QString("%1").arg(count.at(1)) ) );
     f_layout->addRow( new QLabel( QString("Grade 10: ") ), new QLabel(QString("%1").arg(count.at(2)) ) );

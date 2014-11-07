@@ -13,6 +13,7 @@
 #include "commandteacheredit.h"
 #include "commandteachermove.h"
 #include "horizontalheaderview.h"
+#include "highlightitemdelegate.h"
 #include "maintablewidget.h"
 #include "rowgradesdialog.h"
 
@@ -39,11 +40,13 @@ MainWindow::MainWindow(QWidget *parent)
       m_pTableWidget(NULL)
 {
     this->m_pTableWidget = new MainTableWidget(this);
-    setCentralWidget(this->m_pTableWidget);
+    this->setCentralWidget(this->m_pTableWidget);
 
     this->m_pTableWidget->initTableWidget(m_pTableWidget);
     this->m_pTableWidget->insertInstructions( m_pTableWidget );
     this->m_pTableWidget->setUndoStack(m_undoStack);
+
+    this->setMinimumHeight( this->m_pTableWidget->getTableSize().height() );
 
     this->m_HTableHeader = this->m_pTableWidget->HTableHeader();
 
@@ -292,6 +295,16 @@ void MainWindow::createNewTeachers(QTextEdit *inText)
 
     QStringList teacherNames = input.split( "," );
 
+    for(int i=0;i<teacherNames.length();i++)
+    {
+        if(teacherNames.at(i).length()>=18) {
+            QString replaceName = teacherNames.at(i);
+            int chopPoint = teacherNames.at(i).length()-18;
+            replaceName.chop(chopPoint);
+            teacherNames.replace(i, replaceName);
+        }
+    }
+
     this->m_undoStack->push( new CommandTeacherAdd(&teacherNames, &this->m_HTableHeader, this->m_pTableWidget) );
 }
 
@@ -414,12 +427,12 @@ void MainWindow::showClass()
     QString displayedMessage = \
             clickedItem->data(Qt::UserRole).toList().at(MainTableOptions::ClassNotes).toString();
 
-    QMessageBox::information( this, "Class Notes", displayedMessage );
+    QMessageBox::information( this, "Notes", displayedMessage );
 }
 
 void MainWindow::showHelp()
 {
-    QMessageBox::about(this, "Instructions", "This is where instructions will be.");
+    QMessageBox::about(this, "TeacherTable", "TeacherTable version 1.0.\n\nGo to www.vpd29772.vps.ovh.ca for help and updates.");
 }
 
 void MainWindow::showQtHelp()
@@ -455,7 +468,7 @@ void MainWindow::showUndoStack()
 
 QSize MainWindow::getWindowSize()
 {
-    return this->m_pTableWidget->getTableSize(this->m_pTableWidget);
+    return this->m_pTableWidget->getTableSize();
 }
 
 void MainWindow::saveToFile()
@@ -553,6 +566,11 @@ void MainWindow::loadFromFile()
         {
             QTableWidgetItem *newItem = this->m_pTableWidget->item(row, 0);
             newItem->setFlags(newItem->flags() & ~Qt::ItemIsEnabled & ~Qt::ItemIsDropEnabled);
+        }
+
+        for (int col = 1; col < m_pTableWidget->columnCount(); col++)
+        {
+            m_pTableWidget->setItemDelegateForColumn( col, new HighlightItemDelegate(this->m_pTableWidget) );
         }
 
         QStringList inHTableHeader, inVTableHeader;

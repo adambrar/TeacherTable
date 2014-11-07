@@ -137,13 +137,14 @@ void MainTableWidget::insertInstructions( QTableWidget *m_pTableWidget )
 
 }
 
-QSize MainTableWidget::getTableSize( QTableWidget *m_pTableWidget )
+QSize MainTableWidget::getTableSize()
 {
-    int w = m_pTableWidget->verticalHeader()->width() + 4;
-    w += m_pTableWidget->columnWidth(0) * 8;
+    int w = this->verticalHeader()->width() + 4;
+    w += (this->columnWidth(0)*8);
 
-    int h = m_pTableWidget->horizontalHeader()->height() + 4;
-    h += m_pTableWidget->rowHeight(0) * (numBlocks() + numExtraBlocks() + 1);
+    int h = this->horizontalHeader()->height() + 4;
+    for (int i = 0; i < this->rowCount(); i++)
+      h += this->rowHeight(i);
 
     return QSize(w, h);
 }

@@ -20,7 +20,8 @@ signals:
 
 public slots:
     void getInput();
-    void addFile();
+    void addCSVFile();
+    void addExcelFile();
     void cancelAdd();
 
 private:
