@@ -71,19 +71,22 @@ void NewTeacherDialog::addCSVFile()
 
 void NewTeacherDialog::addExcelFile()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Teachers File"), "", tr("Files(*.*)") );
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Teachers File"), "", tr("Files(*.xlsx)") );
 
-    QXlsx::Document xlsxRead(fileName);
-    QXlsx::CellRange range = xlsxRead.dimension();
+    if(!fileName.isNull())
+    {
+        QXlsx::Document xlsxRead(fileName);
+        QXlsx::CellRange range = xlsxRead.dimension();
 
-    QString allText = xlsxRead.cellAt(1,1)->value().toString();
-    for( int row=2; row<range.lastRow(); ++row ) {
-        if( QXlsx::Cell *cell=xlsxRead.cellAt(row, 1) ) {
-            allText = allText % ", " % cell->value().toString();
+        QString allText = xlsxRead.cellAt(1,1)->value().toString();
+        for( int row=2; row<range.lastRow(); ++row ) {
+            if( QXlsx::Cell *cell=xlsxRead.cellAt(row, 1) ) {
+                allText = allText % ", " % cell->value().toString();
+            }
         }
-    }
 
-    this->inText->append(allText);
+        this->inText->append(allText);
+    }
 }
 
 void NewTeacherDialog::showDialog()

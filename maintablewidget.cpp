@@ -2,6 +2,7 @@
 #include "commandclassmove.h"
 #include "horizontalheaderview.h"
 #include "maintableoptions.h"
+#include "highlightitemdelegate.h"
 
 #include <QTableWidget>
 #include <QMouseEvent>
@@ -9,6 +10,9 @@
 #include <QHeaderView>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QPrinter>
+#include <QPainter>
+#include <QScrollBar>
 
 MainTableWidget::MainTableWidget(QWidget *parent) :
     QTableWidget(parent)
@@ -57,6 +61,43 @@ void MainTableWidget::dropEvent(QDropEvent *event)
                     fromIndex.row(), fromIndex.column());
 
     setCurrentCell(toIndex.row(), toIndex.column());
+}
+
+MainTableWidget* MainTableWidget::createPrintableTable()
+{
+    MainTableWidget *tempTable = new MainTableWidget;
+    tempTable->setColumnCount(this->columnCount()-1);
+    tempTable->setRowCount(this->rowCount());
+    tempTable->setVerticalHeaderLabels(this->m_VTableHeader);
+
+    for(int col=1; col<this->columnCount(); col++)
+    {
+        tempTable->setHorizontalHeaderItem(col-1, this->horizontalHeaderItem(col));
+        tempTable->setItem(0, col-1, new QTableWidgetItem("wwwwwww"));
+        tempTable->resizeColumnToContents(col-1);
+        tempTable->setItemDelegateForColumn(col-1, new HighlightItemDelegate(tempTable));
+
+        for(int row=0; row<this->rowCount(); row++)
+        {
+            QTableWidgetItem *tempItem = this->item(row,col)->clone();
+            tempTable->setItem(row, col-1, new QTableWidgetItem(*tempItem->clone()));
+        }
+    }
+
+    tempTable->resizeRowsToContents();
+
+    int height = this->getTableSize(tempTable).height();
+    height += (tempTable->rowHeight(0)*2);
+
+    int width = this->getTableSize(tempTable).width();
+    width -= tempTable->verticalScrollBar()->width();
+
+    tempTable->resize(width, height);
+
+    tempTable->setFocusPolicy(Qt::NoFocus);
+    tempTable->show();
+
+    return tempTable;
 }
 
 void MainTableWidget::setUndoStack(QUndoStack *m_undoStack)
@@ -137,14 +178,15 @@ void MainTableWidget::insertInstructions( QTableWidget *m_pTableWidget )
 
 }
 
-QSize MainTableWidget::getTableSize()
+QSize MainTableWidget::getTableSize(MainTableWidget *table)
 {
-    int w = this->verticalHeader()->width() + 4;
-    w += (this->columnWidth(0)*8);
+    int w = table->verticalHeader()->width()+4;
+    w += (table->columnWidth(0)*table->columnCount());
+    w += table->verticalScrollBar()->width();
 
-    int h = this->horizontalHeader()->height() + 4;
-    for (int i = 0; i < this->rowCount(); i++)
-      h += this->rowHeight(i);
+    int h = table->horizontalHeader()->height()+4;
+    h += (table->rowHeight(0)*table->rowCount());
+    h += table->horizontalScrollBar()->height();
 
     return QSize(w, h);
 }

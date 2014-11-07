@@ -18,13 +18,15 @@ public:
     void dropEvent(QDropEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
 
+    MainTableWidget *createPrintableTable();
+
     void setUndoStack(QUndoStack*);
     void initTableWidget( QTableWidget* );
     void insertInstructions( QTableWidget* );
 
     int numBlocks() { return 8; }
     int numExtraBlocks() { return 2; }
-    QSize getTableSize();
+    QSize getTableSize(MainTableWidget*);
 
     QTableWidgetItem* emptyCell() const;
 

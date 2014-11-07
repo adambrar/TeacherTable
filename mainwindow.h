@@ -34,6 +34,8 @@ private slots:
     void vHeaderSelected(int);
     void cellDoubleClicked(int, int);
 
+    void printTable();
+
     void setClass(QTableWidgetItem*, int, int);
     void editClassDialog();
     void editClass(QTableWidgetItem*, int, int);

@@ -34,6 +34,8 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QStringList>
+#include <QPrinter>
+#include <QPainter>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
@@ -46,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->m_pTableWidget->insertInstructions( m_pTableWidget );
     this->m_pTableWidget->setUndoStack(m_undoStack);
 
-    this->setMinimumHeight( this->m_pTableWidget->getTableSize().height() );
+    this->setMinimumHeight( this->m_pTableWidget->getTableSize(this->m_pTableWidget).height() );
 
     this->m_HTableHeader = this->m_pTableWidget->HTableHeader();
 
@@ -100,6 +102,8 @@ void MainWindow::createMenu()
     fileMenu->addAction("Save &As...", this, SLOT(saveAsToFile()), QKeySequence::SaveAs);
     fileMenu->addAction("&Open...", this, SLOT(loadFromFile()), QKeySequence::Open);
     fileMenu->addSeparator();
+    fileMenu->addAction("&Print...", this, SLOT(printTable()), QKeySequence::Print);
+    fileMenu->addSeparator();
     fileMenu->addAction("&Quit...", this, SLOT(closeWindow()), QKeySequence::Close);
 
     QAction *undoAction = m_undoStack->createUndoAction( this );
@@ -123,6 +127,59 @@ void MainWindow::createMenu()
     helpMenu->addAction( "&About", this, SLOT(showQtHelp()) );
 
 }
+
+void MainWindow::printTable()
+{
+    MainTableWidget *tempTable = this->m_pTableWidget->createPrintableTable();
+
+    QPixmap grabMap = tempTable->grab();
+
+    QPrinter printer;
+    printer.setOutputFileName("test1.pdf");
+    printer.setPageOrientation(QPageLayout::Landscape);
+
+    QPainter painter;
+    painter.begin(&printer);
+    painter.drawPixmap(0, 0, printer.pageRect().width(), printer.pageRect().height(), grabMap);
+    printer.newPage();
+    painter.drawPixmap(0, 0, printer.pageRect().width(), printer.pageRect().height(), grabMap);
+    painter.end();
+
+    QMessageBox::information(this, "Done!", "Finished Printing. Thank you for your patience.");
+}
+
+//    const int rows = this->m_pTableWidget->rowCount();
+//    const int columns = this->m_pTableWidget->columnCount();
+
+//    double totalWidth = this->m_pTableWidget->verticalHeader()->width();
+//    for (int c = 0; c < columns; ++c)
+//        totalWidth += this->m_pTableWidget->columnWidth(c);
+
+//    double totalHeight = this->m_pTableWidget->horizontalHeader()->height();
+//    for (int r = 0; r < rows; ++r)
+//        totalHeight += this->m_pTableWidget->rowHeight(r);
+
+//    MainTableWidget tempTable;
+//    tempTable.setAttribute(Qt::WA_DontShowOnScreen);
+//    tempTable.setModel(this->m_pTableWidget->model());
+//    tempTable.setFixedSize(totalWidth, totalHeight);
+//    tempTable.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//    tempTable.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//    QPixmap grabPixmap = tempTable.grab();
+
+//    QPrinter printer;
+//    printer.setOutputFormat(QPrinter::PdfFormat);
+//    //printer.setPageOrientation(QPageLayout::Landscape);
+//    printer.setOutputFileName("test.pdf");
+//    QPainter painter;
+//    painter.begin(&printer);
+//    double xscale = printer.pageRect().width()/double(grabPixmap.width());
+//    double yscale = printer.pageRect().height()/double(grabPixmap.height());
+//    double scale = qMin(xscale, yscale);
+//    painter.translate(printer.paperRect().x() + printer.pageRect().width()/2,
+//                    printer.paperRect().y() + printer.pageRect().height()/2);
+//    painter.scale(scale, scale);
+//    painter.translate(-width()/2, -height()/2);
 
 void MainWindow::cellContextMenu(QPoint point)
 {
@@ -302,6 +359,8 @@ void MainWindow::createNewTeachers(QTextEdit *inText)
             int chopPoint = teacherNames.at(i).length()-18;
             replaceName.chop(chopPoint);
             teacherNames.replace(i, replaceName);
+        } else if(teacherNames.at(i).length()<1) {
+            teacherNames.removeAt(i);
         }
     }
 
@@ -468,7 +527,7 @@ void MainWindow::showUndoStack()
 
 QSize MainWindow::getWindowSize()
 {
-    return this->m_pTableWidget->getTableSize();
+    return this->m_pTableWidget->getTableSize(this->m_pTableWidget);
 }
 
 void MainWindow::saveToFile()
