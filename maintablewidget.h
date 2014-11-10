@@ -18,7 +18,7 @@ public:
     void dropEvent(QDropEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
 
-    MainTableWidget *createPrintableTable();
+    QList<MainTableWidget *> createPrintableTable(int pageWidth);
 
     void setUndoStack(QUndoStack*);
     void initTableWidget( QTableWidget* );

@@ -34,8 +34,11 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QStringList>
+#include <QLabel>
 #include <QPrinter>
+#include <QPrintDialog>
 #include <QPainter>
+#include <QDate>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
@@ -102,7 +105,8 @@ void MainWindow::createMenu()
     fileMenu->addAction("Save &As...", this, SLOT(saveAsToFile()), QKeySequence::SaveAs);
     fileMenu->addAction("&Open...", this, SLOT(loadFromFile()), QKeySequence::Open);
     fileMenu->addSeparator();
-    fileMenu->addAction("&Print...", this, SLOT(printTable()), QKeySequence::Print);
+    fileMenu->addAction("&Print Table...", this, SLOT(printTable()), QKeySequence::Print);
+    fileMenu->addAction("&Export as PDF...", this, SLOT(tableToPDF()));
     fileMenu->addSeparator();
     fileMenu->addAction("&Quit...", this, SLOT(closeWindow()), QKeySequence::Close);
 
@@ -130,22 +134,72 @@ void MainWindow::createMenu()
 
 void MainWindow::printTable()
 {
-    MainTableWidget *tempTable = this->m_pTableWidget->createPrintableTable();
-
-    QPixmap grabMap = tempTable->grab();
-
     QPrinter printer;
-    printer.setOutputFileName("test1.pdf");
     printer.setPageOrientation(QPageLayout::Landscape);
+
+    QList<MainTableWidget*> tempTables = this->m_pTableWidget->createPrintableTable(printer.pageRect().width());
+
+    QPixmap grabMap = tempTables.at(0)->grab();
+
+    QLabel label("Page 1 of 1");
+    QPixmap grabLabel = label.grab();
+
+    QPrintDialog *dialog = new QPrintDialog(&printer, this);
+    dialog->setWindowTitle(tr("Print Document"));
+
+    if (dialog->exec() != QDialog::Accepted)
+        return;
 
     QPainter painter;
     painter.begin(&printer);
-    painter.drawPixmap(0, 0, printer.pageRect().width(), printer.pageRect().height(), grabMap);
+    painter.drawPixmap(0, 0, tempTables.at(0)->width(), printer.pageRect().height()-grabLabel.height(), grabMap);
+    painter.drawPixmap(0,printer.pageRect().height()-grabLabel.height(),grabLabel.width(),grabLabel.height(), grabLabel);
     printer.newPage();
     painter.drawPixmap(0, 0, printer.pageRect().width(), printer.pageRect().height(), grabMap);
     painter.end();
 
-    QMessageBox::information(this, "Done!", "Finished Printing. Thank you for your patience.");
+    QMessageBox::information(this, "Done!", "Finished printing table.");
+}
+
+void MainWindow::tableToPDF()
+{
+    QString saveFile = QFileDialog::getSaveFileName(this, QString("Save TimeTable"), \
+                                                    "", QString("PDF(*.pdf)") );
+
+    QPrinter printer;
+    printer.setOutputFileName(saveFile);
+    printer.setPageOrientation(QPageLayout::Landscape);
+
+    QList<MainTableWidget*> tempTables = this->m_pTableWidget-> \
+                                    createPrintableTable(printer.pageRect().width());
+
+    QPainter painter;
+    painter.begin(&printer);
+    for(int i=0;i<tempTables.size();i++)
+    {
+        QPixmap grabMap = tempTables.at(i)->grab();
+
+        QLabel pageLabel(QString("Page %1 of %2").arg(i+1).arg(tempTables.size()));
+        QPixmap grabPageLabel = pageLabel.grab();
+        QString date = QDate::currentDate().toString("dddd dd, MMMM, yyyy");
+        QLabel dateLabel(date);
+        QPixmap grabDateLabel = dateLabel.grab();
+
+        painter.drawPixmap(10, 0, tempTables.at(i)->width(), \
+                           printer.pageRect().height()-grabPageLabel.height(), grabMap);
+
+        painter.drawPixmap(0, printer.pageRect().height()-grabPageLabel.height(), \
+                           grabPageLabel.width(), grabPageLabel.height(), grabPageLabel);
+
+        painter.drawPixmap(printer.pageRect().width()-grabDateLabel.width(), \
+                           printer.pageRect().height()-grabDateLabel.height(), \
+                           grabDateLabel.width(), grabPageLabel.height(), grabDateLabel);
+
+        if(i != tempTables.size()-1)
+            printer.newPage();
+    }
+    painter.end();
+    QMessageBox::information(this, "Done!", "Finished exporting table.");
 }
 
 //    const int rows = this->m_pTableWidget->rowCount();
@@ -169,7 +223,7 @@ void MainWindow::printTable()
 
 //    QPrinter printer;
 //    printer.setOutputFormat(QPrinter::PdfFormat);
-//    //printer.setPageOrientation(QPageLayout::Landscape);
+//    printer.setPageOrientation(QPageLayout::Landscape);
 //    printer.setOutputFileName("test.pdf");
 //    QPainter painter;
 //    painter.begin(&printer);

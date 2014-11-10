@@ -2,6 +2,7 @@
 
 #include <QStringList>
 #include <QTableWidget>
+#include <QHeaderView>
 
 CommandTeacherEdit::CommandTeacherEdit(int column, QString name, \
                                        QTableWidget *m_pTableWidget, \

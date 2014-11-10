@@ -35,6 +35,7 @@ private slots:
     void cellDoubleClicked(int, int);
 
     void printTable();
+    void tableToPDF();
 
     void setClass(QTableWidgetItem*, int, int);
     void editClassDialog();

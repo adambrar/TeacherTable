@@ -63,41 +63,68 @@ void MainTableWidget::dropEvent(QDropEvent *event)
     setCurrentCell(toIndex.row(), toIndex.column());
 }
 
-MainTableWidget* MainTableWidget::createPrintableTable()
+QList<MainTableWidget*> MainTableWidget::createPrintableTable(int pageWidth)
 {
-    MainTableWidget *tempTable = new MainTableWidget;
-    tempTable->setColumnCount(this->columnCount()-1);
-    tempTable->setRowCount(this->rowCount());
-    tempTable->setVerticalHeaderLabels(this->m_VTableHeader);
+    QList<MainTableWidget*> tempTables;
 
-    for(int col=1; col<this->columnCount(); col++)
+    int colsPerPage = (pageWidth - this->verticalHeader()->width()) / this->columnWidth(0);
+    int numPages = this->columnCount() / colsPerPage;
+    if(this->columnCount()%colsPerPage != 0)
+        numPages++;
+
+    for(int page=0; page<numPages; page++)
     {
-        tempTable->setHorizontalHeaderItem(col-1, this->horizontalHeaderItem(col));
-        tempTable->setItem(0, col-1, new QTableWidgetItem("wwwwwww"));
-        tempTable->resizeColumnToContents(col-1);
-        tempTable->setItemDelegateForColumn(col-1, new HighlightItemDelegate(tempTable));
+        tempTables.append(new MainTableWidget);
+        tempTables.at(page)->setColumnCount(colsPerPage);
+        tempTables.at(page)->setRowCount(numBlocks());
+        tempTables.at(page)->setVerticalHeaderLabels(this->m_VTableHeader);
 
-        for(int row=0; row<this->rowCount(); row++)
+        tempTables.at(page)->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        tempTables.at(page)->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+        int startCol = 1;
+        if(page != 0)
+            startCol = page*colsPerPage + 1;
+
+        int finishCol = (page+1)*colsPerPage+1;
+        if(finishCol > this->columnCount())
         {
-            QTableWidgetItem *tempItem = this->item(row,col)->clone();
-            tempTable->setItem(row, col-1, new QTableWidgetItem(*tempItem->clone()));
+            finishCol = this->columnCount();
+            tempTables.at(page)->setColumnCount(finishCol - startCol);
         }
+
+        int tempCol = 0;
+
+        for(int col=startCol; col<finishCol; col++)
+        {
+            tempTables.at(page)->setHorizontalHeaderItem(tempCol, this->horizontalHeaderItem(col));
+            tempTables.at(page)->setItem(0, tempCol, new QTableWidgetItem("wwwwwww"));
+            tempTables.at(page)->resizeColumnToContents(tempCol);
+            tempTables.at(page)->setItemDelegateForColumn(tempCol, new HighlightItemDelegate(tempTables.at(0)));
+
+            for(int row=0; row<numBlocks(); row++)
+            {
+                QTableWidgetItem *tempItem = this->item(row,col)->clone();
+                tempTables.at(page)->setItem(row, tempCol, new QTableWidgetItem(*tempItem->clone()));
+            }
+            tempCol++;
+        }
+
+        tempTables.at(page)->resizeRowsToContents();
+
+        int height = this->getTableSize(tempTables.at(page)).height();
+
+        int width = this->getTableSize(tempTables.at(page)).width();
+        width -= tempTables.at(page)->verticalScrollBar()->width();
+
+        tempTables.at(page)->resize(width, height);
+
+        tempTables.at(page)->setFocusPolicy(Qt::NoFocus);
+        if(tempTables.at(page)->columnCount()<1)
+            tempTables.removeAt(page);
     }
 
-    tempTable->resizeRowsToContents();
-
-    int height = this->getTableSize(tempTable).height();
-    height += (tempTable->rowHeight(0)*2);
-
-    int width = this->getTableSize(tempTable).width();
-    width -= tempTable->verticalScrollBar()->width();
-
-    tempTable->resize(width, height);
-
-    tempTable->setFocusPolicy(Qt::NoFocus);
-    tempTable->show();
-
-    return tempTable;
+    return tempTables;
 }
 
 void MainTableWidget::setUndoStack(QUndoStack *m_undoStack)
@@ -111,7 +138,7 @@ void MainTableWidget::initTableWidget( QTableWidget *m_pTableWidget )
     m_pTableWidget->setColumnCount(1);
 
     m_HTableHeader.clear();
-    m_HTableHeader<<"A\nD\nD\n \nT\nE\nA\nC\nH\nE\nR";
+    m_HTableHeader<<" \n \n \nA\nD\nD\n \nT\nE\nA\nC\nH\nE\nR\n \n ";
     m_VTableHeader.clear();
     m_VTableHeader<<"  A "<<"  B "<<"  C "<<"  D "<<"  E "<<"  F "<<"  G "<<"  H "<<" "<<" "<<" ";
     m_pTableWidget->setHorizontalHeaderLabels(m_HTableHeader);
