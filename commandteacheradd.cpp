@@ -14,7 +14,14 @@ CommandTeacherAdd::CommandTeacherAdd(QStringList *newTeachersNames, QStringList 
     this->teacherNames = new QStringList;
     foreach(QString name, *newTeachersNames)
     {
-        this->teacherNames->append(name);
+        if(name.length() > 15) {
+            name.chop(name.length() - 15);
+            this->teacherNames->append(name);
+        } else if(name.length() < 1) {
+            teacherNames->removeOne(name);
+        } else {
+            this->teacherNames->append(name);
+        }
     }
 
     this->m_oldHTableHeader = new QStringList(*hTableHeader);

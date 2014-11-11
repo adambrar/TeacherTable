@@ -65,9 +65,9 @@ void MainTableWidget::dropEvent(QDropEvent *event)
 
 QList<MainTableWidget*> MainTableWidget::createPrintableTable(int pageWidth)
 {
-    QList<MainTableWidget*> tempTables;
+   QList<MainTableWidget*> tempTables;
 
-    int colsPerPage = (pageWidth - this->verticalHeader()->width()) / this->columnWidth(0);
+    int colsPerPage = (pageWidth - this->verticalHeader()->width()) / this->columnWidth(1);
     int numPages = this->columnCount() / colsPerPage;
     if(this->columnCount()%colsPerPage != 0)
         numPages++;
@@ -78,6 +78,7 @@ QList<MainTableWidget*> MainTableWidget::createPrintableTable(int pageWidth)
         tempTables.at(page)->setColumnCount(colsPerPage);
         tempTables.at(page)->setRowCount(numBlocks());
         tempTables.at(page)->setVerticalHeaderLabels(this->m_VTableHeader);
+        tempTables.at(page)->horizontalHeader()->setFixedHeight(this->horizontalHeader()->height());
 
         tempTables.at(page)->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         tempTables.at(page)->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

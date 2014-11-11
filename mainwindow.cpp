@@ -134,15 +134,17 @@ void MainWindow::createMenu()
 
 void MainWindow::printTable()
 {
+    if(this->m_pTableWidget->columnCount() < 2)
+    {
+        QMessageBox::information(this, "Ooops!", "Nothing to print.");
+        return;
+    }
+
     QPrinter printer;
     printer.setPageOrientation(QPageLayout::Landscape);
 
-    QList<MainTableWidget*> tempTables = this->m_pTableWidget->createPrintableTable(printer.pageRect().width());
-
-    QPixmap grabMap = tempTables.at(0)->grab();
-
-    QLabel label("Page 1 of 1");
-    QPixmap grabLabel = label.grab();
+    QList<MainTableWidget*> tempTables = \
+            this->m_pTableWidget->createPrintableTable(printer.pageRect().width());
 
     QPrintDialog *dialog = new QPrintDialog(&printer, this);
     dialog->setWindowTitle(tr("Print Document"));
@@ -150,28 +152,9 @@ void MainWindow::printTable()
     if (dialog->exec() != QDialog::Accepted)
         return;
 
-    QPainter painter;
-    painter.begin(&printer);
-    painter.drawPixmap(0, 0, tempTables.at(0)->width(), printer.pageRect().height()-grabLabel.height(), grabMap);
-    painter.drawPixmap(0,printer.pageRect().height()-grabLabel.height(),grabLabel.width(),grabLabel.height(), grabLabel);
-    printer.newPage();
-    painter.drawPixmap(0, 0, printer.pageRect().width(), printer.pageRect().height(), grabMap);
-    painter.end();
-
-    QMessageBox::information(this, "Done!", "Finished printing table.");
-}
-
-void MainWindow::tableToPDF()
-{
-    QString saveFile = QFileDialog::getSaveFileName(this, QString("Save TimeTable"), \
-                                                    "", QString("PDF(*.pdf)") );
-
-    QPrinter printer;
-    printer.setOutputFileName(saveFile);
-    printer.setPageOrientation(QPageLayout::Landscape);
-
-    QList<MainTableWidget*> tempTables = this->m_pTableWidget-> \
-                                    createPrintableTable(printer.pageRect().width());
+    QString date = QDate::currentDate().toString("dddd dd, MMMM, yyyy");
+    QLabel dateLabel(date);
+    QPixmap grabDateLabel = dateLabel.grab();
 
     QPainter painter;
     painter.begin(&printer);
@@ -181,9 +164,6 @@ void MainWindow::tableToPDF()
 
         QLabel pageLabel(QString("Page %1 of %2").arg(i+1).arg(tempTables.size()));
         QPixmap grabPageLabel = pageLabel.grab();
-        QString date = QDate::currentDate().toString("dddd dd, MMMM, yyyy");
-        QLabel dateLabel(date);
-        QPixmap grabDateLabel = dateLabel.grab();
 
         painter.drawPixmap(10, 0, tempTables.at(i)->width(), \
                            printer.pageRect().height()-grabPageLabel.height(), grabMap);
@@ -199,41 +179,61 @@ void MainWindow::tableToPDF()
             printer.newPage();
     }
     painter.end();
-    QMessageBox::information(this, "Done!", "Finished exporting table.");
+
+    QMessageBox::information(this, "Done!", "Finished printing table.");
 }
 
-//    const int rows = this->m_pTableWidget->rowCount();
-//    const int columns = this->m_pTableWidget->columnCount();
+void MainWindow::tableToPDF()
+{
+    if(this->m_pTableWidget->columnCount() < 2)
+    {
+        QMessageBox::information(this, "Ooops!", "Nothing to print.");
+        return;
+    }
 
-//    double totalWidth = this->m_pTableWidget->verticalHeader()->width();
-//    for (int c = 0; c < columns; ++c)
-//        totalWidth += this->m_pTableWidget->columnWidth(c);
+    QString saveFile = QFileDialog::getSaveFileName(this, QString("Save TimeTable"), \
+                                                    "", QString("PDF(*.pdf)") );
 
-//    double totalHeight = this->m_pTableWidget->horizontalHeader()->height();
-//    for (int r = 0; r < rows; ++r)
-//        totalHeight += this->m_pTableWidget->rowHeight(r);
+    if(saveFile.length() < 1)
+        return;
 
-//    MainTableWidget tempTable;
-//    tempTable.setAttribute(Qt::WA_DontShowOnScreen);
-//    tempTable.setModel(this->m_pTableWidget->model());
-//    tempTable.setFixedSize(totalWidth, totalHeight);
-//    tempTable.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-//    tempTable.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-//    QPixmap grabPixmap = tempTable.grab();
+    QPrinter printer;
+    printer.setOutputFileName(saveFile);
+    printer.setPageOrientation(QPageLayout::Landscape);
 
-//    QPrinter printer;
-//    printer.setOutputFormat(QPrinter::PdfFormat);
-//    printer.setPageOrientation(QPageLayout::Landscape);
-//    printer.setOutputFileName("test.pdf");
-//    QPainter painter;
-//    painter.begin(&printer);
-//    double xscale = printer.pageRect().width()/double(grabPixmap.width());
-//    double yscale = printer.pageRect().height()/double(grabPixmap.height());
-//    double scale = qMin(xscale, yscale);
-//    painter.translate(printer.paperRect().x() + printer.pageRect().width()/2,
-//                    printer.paperRect().y() + printer.pageRect().height()/2);
-//    painter.scale(scale, scale);
-//    painter.translate(-width()/2, -height()/2);
+    QList<MainTableWidget*> tempTables = this->m_pTableWidget-> \
+                                    createPrintableTable(printer.pageRect().width());
+
+    QString date = QDate::currentDate().toString("dddd dd, MMMM, yyyy");
+    QLabel dateLabel(date);
+    QPixmap grabDateLabel = dateLabel.grab();
+
+    QPainter painter;
+    painter.begin(&printer);
+    for(int i=0;i<tempTables.size();i++)
+    {
+        QPixmap grabMap = tempTables.at(i)->grab();
+
+        QLabel pageLabel(QString("Page %1 of %2").arg(i+1).arg(tempTables.size()));
+        QPixmap grabPageLabel = pageLabel.grab();
+
+        painter.drawPixmap(10, 0, tempTables.at(i)->width(), \
+                           printer.pageRect().height()-grabPageLabel.height(), grabMap);
+
+        painter.drawPixmap(0, printer.pageRect().height()-grabPageLabel.height(), \
+                           grabPageLabel.width(), grabPageLabel.height(), grabPageLabel);
+
+        painter.drawPixmap(printer.pageRect().width()-grabDateLabel.width(), \
+                           printer.pageRect().height()-grabDateLabel.height(), \
+                           grabDateLabel.width(), grabPageLabel.height(), grabDateLabel);
+
+        if(i != tempTables.size()-1)
+            printer.newPage();
+    }
+    painter.end();
+
+    QMessageBox::information(this, "Done!", "Finished exporting table.");
+}
 
 void MainWindow::cellContextMenu(QPoint point)
 {
