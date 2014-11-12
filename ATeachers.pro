@@ -35,7 +35,8 @@ SOURCES += main.cpp\
     maintableoptions.cpp \
     commandclasshighlight.cpp \
     highlightitemdelegate.cpp \
-    helpdialog.cpp
+    helpdialog.cpp \
+    classhelper.cpp
 
 HEADERS  += \
     commandclassadd.h \
@@ -57,4 +58,5 @@ HEADERS  += \
     maintableoptions.h \
     commandclasshighlight.h \
     highlightitemdelegate.h \
-    helpdialog.h
+    helpdialog.h \
+    classhelper.h

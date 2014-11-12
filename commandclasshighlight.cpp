@@ -31,6 +31,7 @@ void CommandClassHighlight::undo()
 
     this->m_tableWidget->hide();
     this->m_tableWidget->show();
+    m_tableWidget->setCurrentCell(row, col);
 }
 
 void CommandClassHighlight::redo()
@@ -43,4 +44,5 @@ void CommandClassHighlight::redo()
 
     this->m_tableWidget->hide();
     this->m_tableWidget->show();
+    m_tableWidget->setCurrentCell(row, col);
 }

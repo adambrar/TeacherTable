@@ -52,6 +52,7 @@ void CommandClassPaste::undo()
     this->m_tableWidget->setItem( this->toRow, \
                                   this->toCol, \
                                   new QTableWidgetItem(*this->m_fromClass) );
+    m_tableWidget->setCurrentCell(toRow, toCol);
 }
 
 void CommandClassPaste::redo()
@@ -60,4 +61,5 @@ void CommandClassPaste::redo()
     this->m_tableWidget->setItem( this->toRow, \
                                   this->toCol, \
                                   new QTableWidgetItem(*this->m_toClass) );
+    m_tableWidget->setCurrentCell(toRow, toCol);
 }

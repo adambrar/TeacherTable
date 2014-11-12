@@ -14,6 +14,7 @@ class MainTableWidget;
 class QTableWidgetItem;
 class QUndoStack;
 class QUndoView;
+class ClassHelper;
 
 
 class MainWindow : public QMainWindow
@@ -37,16 +38,7 @@ private slots:
     void printTable();
     void tableToPDF();
 
-    void setClass(QTableWidgetItem*, int, int);
     void editClassDialog();
-    void editClass(QTableWidgetItem*, int, int);
-    void deleteClass();
-    void moveClass(QTableWidgetItem*, int toRow, int toCol, \
-                   int fromRow, int fromCol);
-    void copyClass();
-    void pasteClass();
-    void highlightClass(int, int, QString);
-    void showClass();
 
     void createNewTeachers(QTextEdit*);
     void editTeacher(QString, int);
@@ -77,6 +69,8 @@ private:
     QStringList m_VTableHeader;
 
     QString *m_saveFileName;
+
+    ClassHelper *classHelper;
 };
 
 #endif // MAINWINDOW_H

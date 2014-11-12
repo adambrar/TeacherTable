@@ -36,6 +36,7 @@ CommandClassAdd::~CommandClassAdd()
 void CommandClassAdd::undo()
 {
     m_tableWidget->setItem( row, col, new QTableWidgetItem(*m_fromClass) );
+    m_tableWidget->setCurrentCell(row, col);
 }
 
 void CommandClassAdd::redo()
@@ -47,4 +48,5 @@ void CommandClassAdd::redo()
     m_tableWidget->item(row, col)-> \
             setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor(grade));
 
+    m_tableWidget->setCurrentCell(row, col);
 }

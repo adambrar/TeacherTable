@@ -37,6 +37,7 @@ void CommandClassDelete::undo()
         m_tableWidget->item(row, col)-> \
                 setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor(grade));
     }
+    m_tableWidget->setCurrentCell(row, col);
 }
 
 //removes class item from cell and colors cell white
@@ -47,4 +48,5 @@ void CommandClassDelete::redo()
     m_tableWidget->item(row, col)-> \
             setBackgroundColor(this->m_tableWidget->TableOptions()->getGradeColor());
 
+    m_tableWidget->setCurrentCell(row, col);
 }

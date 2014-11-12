@@ -21,6 +21,7 @@ public:
     QList<MainTableWidget *> createPrintableTable(int pageWidth);
 
     void setUndoStack(QUndoStack*);
+
     void initTableWidget( QTableWidget* );
     void insertInstructions( QTableWidget* );
 
