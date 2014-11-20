@@ -21,7 +21,7 @@ void HighlightItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         QString data = index.data(Qt::UserRole).toStringList().at(MainTableOptions::ClassHighlight);
 
         QPen pen;
-        pen.setWidth(4);
+        pen.setWidth(5);
 
         if( data == "Highlight 1") {
             pen.setColor( QColor(255,201,138) );

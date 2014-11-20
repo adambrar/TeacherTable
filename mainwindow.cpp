@@ -36,16 +36,37 @@
 #include <QPrintDialog>
 #include <QPainter>
 #include <QDate>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent),
-      m_pTableWidget(NULL)
+    : QMainWindow(parent)
 {
     this->m_undoStack = new QUndoStack(this);
     this->m_undoView = 0;
 
     this->m_pTableWidget = new MainTableWidget(this);
-    this->setCentralWidget(this->m_pTableWidget);
+    this->m_tableTitle = new QLabel("School Timetable - version 1");
+    this->m_tableTitle->setAlignment(Qt::AlignCenter);
+
+    if (this->m_tableTitle->fontInfo().pointSize() != -1) {
+        QFont font(this->m_tableTitle->font());
+        font.setPointSize(this->m_tableTitle->font().pointSize()+6);
+        this->m_tableTitle->setFont(font);
+    } else if (this->m_tableTitle->fontInfo().pixelSize() != -1) {
+        QFont font(this->m_tableTitle->font());
+        font.setPixelSize(this->m_tableTitle->font().pixelSize()+10);
+        this->m_tableTitle->setFont(font);
+    }
+
+    this->mainWidget = new QWidget();
+
+    this->m_verticalWindowLayout = new QVBoxLayout;
+    this->m_verticalWindowLayout->addWidget(this->m_tableTitle);
+    this->m_verticalWindowLayout->addWidget(this->m_pTableWidget);
+    mainWidget->setLayout(this->m_verticalWindowLayout);
+
+    this->setCentralWidget(mainWidget);
 
     this->m_pTableWidget->initTableWidget(m_pTableWidget);
     this->m_pTableWidget->insertInstructions( m_pTableWidget );
@@ -213,6 +234,8 @@ void MainWindow::tableToPDF()
     QLabel dateLabel(date);
     QPixmap grabDateLabel = dateLabel.grab();
 
+    QPixmap grabTableTitle = this->m_tableTitle->grab();
+
     QPainter painter;
     painter.begin(&printer);
     for(int i=0;i<tempTables.size();i++)
@@ -222,7 +245,10 @@ void MainWindow::tableToPDF()
         QLabel pageLabel(QString("Page %1 of %2").arg(i+1).arg(tempTables.size()));
         QPixmap grabPageLabel = pageLabel.grab();
 
-        painter.drawPixmap(10, 0, tempTables.at(i)->width(), \
+        painter.drawPixmap(10, 0, printer.pageRect().width(), \
+                           grabTableTitle.height(), grabTableTitle);
+
+        painter.drawPixmap(10, grabTableTitle.height(), tempTables.at(i)->width(), \
                            printer.pageRect().height()-grabPageLabel.height(), grabMap);
 
         painter.drawPixmap(0, printer.pageRect().height()-grabPageLabel.height(), \
@@ -409,39 +435,6 @@ void MainWindow::createNewTeachersDialog()
 
     newTeach->showDialog();
 }
-
-//void MainWindow::createNewTeachers(QTextEdit *inText)
-//{
-//    QString input = inText->toPlainText().simplified().toUpper();
-//    if(input.length() < 1) { return; }
-
-//    QStringList teacherNames = input.split( "," );
-
-//    for(int i=0;i<teacherNames.length();i++)
-//    {
-//        if(teacherNames.at(i).length()>=18) {
-//            QString replaceName = teacherNames.at(i);
-//            int chopPoint = teacherNames.at(i).length()-18;
-//            replaceName.chop(chopPoint);
-//            teacherNames.replace(i, replaceName);
-//        } else if(teacherNames.at(i).length()<1) {
-//            teacherNames.removeAt(i);
-//        }
-//    }
-
-//    this->m_undoStack->push( new CommandTeacherAdd(&teacherNames, &this->m_pTableWidget->HTableHeader(), this->m_pTableWidget) );
-//}
-
-//void MainWindow::editTeacher(QString headerAfter, int column)
-//{
-//    this->m_undoStack->push( new CommandTeacherEdit(column, headerAfter, this->m_pTableWidget, \
-//                                                    &this->m_pTableWidget->HTableHeader()) );
-//}
-
-//void MainWindow::moveTeacher(int fromIndex, int toIndex)
-//{
-//    this->m_undoStack->push( new CommandTeacherMove(this->m_pTableWidget, fromIndex, toIndex));
-//}
 
 void MainWindow::editClassDialog()
 {

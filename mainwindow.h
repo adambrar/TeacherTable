@@ -16,6 +16,8 @@ class QUndoStack;
 class QUndoView;
 class ClassHelper;
 class TeacherHelper;
+class QLabel;
+class QVBoxLayout;
 
 
 class MainWindow : public QMainWindow
@@ -41,10 +43,7 @@ private slots:
 
     void editClassDialog();
 
-//    void createNewTeachers(QTextEdit*);
     void createNewTeachersDialog();
-//    void editTeacher(QString, int);
-//    void moveTeacher(int, int);
 
     void createNewTable();
     void cellContextMenu(QPoint);
@@ -68,6 +67,10 @@ private:
     MainTableWidget *m_pTableWidget;
 
     QString *m_saveFileName;
+
+    QLabel *m_tableTitle;
+    QVBoxLayout *m_verticalWindowLayout;
+    QWidget *mainWidget;
 
     ClassHelper *classHelper;
     TeacherHelper *teacherHelper;

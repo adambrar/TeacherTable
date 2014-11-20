@@ -36,7 +36,7 @@ NewTeacherDialog::NewTeacherDialog(QWidget *parent) :
     f_layout->addRow( buttonsLayout );
 
     setLayout(f_layout);
-    cancelButton->setFocus();
+    inText->setFocus();
 
     connect( addTeacherButton, SIGNAL(clicked()), this, SLOT(getInput()) );
     connect( addCSVFileButton, SIGNAL(clicked()), this, SLOT(addCSVFile()) );
