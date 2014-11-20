@@ -229,6 +229,16 @@ void MainTableWidget::setHTableHeader(const QStringList &HTableHeader)
     m_HTableHeader = HTableHeader;
 }
 
+void MainTableWidget::HTableHeaderAppend(const QString name)
+{
+    this->m_HTableHeader.append(name);
+}
+
+void MainTableWidget::HTableHeaderRemoveLast()
+{
+    this->m_HTableHeader.removeLast();
+}
+
 QStringList MainTableWidget::VTableHeader() const
 {
     return m_VTableHeader;

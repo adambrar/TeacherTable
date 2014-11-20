@@ -3,12 +3,12 @@
 
 #include <QUndoCommand>
 
-class QTableWidget;
+class MainTableWidget;
 
 class CommandTeacherEdit : public QUndoCommand
 {
 public:
-    explicit CommandTeacherEdit(int, QString, QTableWidget*, QStringList*, QObject *parent = 0);
+    explicit CommandTeacherEdit(int, QString, MainTableWidget *, QObject *parent = 0);
 
     ~CommandTeacherEdit();
 
@@ -20,8 +20,7 @@ signals:
 public slots:
 
 private:
-    QStringList *m_HTableHeader;
-    QTableWidget *m_tableWidget;
+    MainTableWidget *m_tableWidget;
     QString headerBefore;
     QString headerAfter;
     int editedColumn;

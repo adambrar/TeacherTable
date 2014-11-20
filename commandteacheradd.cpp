@@ -1,15 +1,13 @@
 #include "commandteacheradd.h"
 #include "highlightitemdelegate.h"
+#include "maintablewidget.h"
 
-#include <QTableWidget>
 #include <QHeaderView>
 #include <QtCore/QStringList>
 
-CommandTeacherAdd::CommandTeacherAdd(QStringList *newTeachersNames, QStringList *hTableHeader, \
-                                     QTableWidget *tableWidget, QObject*)
+CommandTeacherAdd::CommandTeacherAdd(QStringList *newTeachersNames, QStringList *hTableHeader, MainTableWidget *tableWidget, QObject*)
 {
     this->m_tableWidget = tableWidget;
-    this->m_newHTableHeader = hTableHeader;
 
     this->teacherNames = new QStringList;
     foreach(QString name, *newTeachersNames)
@@ -40,7 +38,7 @@ void CommandTeacherAdd::undo()
     for( int i=0; i < this->teacherNames->size(); i++ )
     {
         m_tableWidget->removeColumn( m_tableWidget->columnCount() - 1 );
-        m_newHTableHeader->removeLast();
+        this->m_tableWidget->HTableHeaderRemoveLast();
     }
 }
 
@@ -59,8 +57,7 @@ void CommandTeacherAdd::redo()
             formattedName.append("\n");
         }
 
-        m_newHTableHeader->append(formattedName);
-        m_tableWidget->setHorizontalHeaderLabels(*m_newHTableHeader);
+        m_tableWidget->HTableHeaderAppend(formattedName);
 
         m_tableWidget->setItem( 0, m_tableWidget->columnCount() - 1, \
                                  new QTableWidgetItem("wwwwwww") );
@@ -78,6 +75,7 @@ void CommandTeacherAdd::redo()
             m_tableWidget->setItem(row, m_tableWidget->columnCount() - 1, newItem);
 
         }
-
     }
+    m_tableWidget->setHorizontalHeaderLabels(m_tableWidget->HTableHeader());
+
 }

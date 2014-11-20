@@ -6,12 +6,11 @@ MainTableOptions::MainTableOptions(QWidget *parent) :
     QWidget(parent)
 {
     gradeColors = new QList<QColor>;
-
-    gradeColors->append(QColor(204,86,40));
-    gradeColors->append(QColor(153,98,76));
-    gradeColors->append(QColor(255,25,32));
-    gradeColors->append(QColor(92,255,89));
-    gradeColors->append(QColor(101,204,40));
+    gradeColors->append(QColor(0,255,205));
+    gradeColors->append(QColor(255,75,40));
+    gradeColors->append(QColor(255,161,0));
+    gradeColors->append(QColor(23,117,255));
+    gradeColors->append(QColor(78,196,0));
     gradeColors->append(QColor(0,0,0));
 
     this->highlightMenu = new QMenu;
@@ -27,7 +26,7 @@ MainTableOptions::~MainTableOptions()
 QColor MainTableOptions::getGradeColor(QString grade)
 {
     QColor newBackgroundColor = QColor(255,255,255);
-    int factor(130);
+    int factor(120);
 
     if(grade.contains("12")) {
         newBackgroundColor = this->gradeColors->at(4);

@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     commandclasshighlight.cpp \
     highlightitemdelegate.cpp \
     helpdialog.cpp \
-    classhelper.cpp
+    classhelper.cpp \
+    teacherhelper.cpp
 
 HEADERS  += \
     commandclassadd.h \
@@ -59,4 +60,5 @@ HEADERS  += \
     commandclasshighlight.h \
     highlightitemdelegate.h \
     helpdialog.h \
-    classhelper.h
+    classhelper.h \
+    teacherhelper.h

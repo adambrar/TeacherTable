@@ -2,12 +2,7 @@
 #include "newteacherdialog.h"
 #include "newclassdialog.h"
 #include "editteacherdialog.h"
-#include "commandclassadd.h"
 #include "commandclassdelete.h"
-#include "commandclassmove.h"
-#include "commandclassedit.h"
-#include "commandclasspaste.h"
-#include "commandclasshighlight.h"
 #include "commandteacheradd.h"
 #include "commandteacherdelete.h"
 #include "commandteacheredit.h"
@@ -17,6 +12,7 @@
 #include "maintablewidget.h"
 #include "rowgradesdialog.h"
 #include "classhelper.h"
+#include "teacherhelper.h"
 
 
 #include <QApplication>
@@ -59,8 +55,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setMinimumHeight( this->m_pTableWidget->getTableSize(this->m_pTableWidget).height() );
 
-    this->m_HTableHeader = this->m_pTableWidget->HTableHeader();
-
     connect( this->m_pTableWidget, SIGNAL( cellDoubleClicked (int, int) ),
              this, SLOT( cellDoubleClicked( int, int ) ) );
 
@@ -76,7 +70,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect( this->m_pTableWidget, SIGNAL(classMoved(QTableWidgetItem*,int,int,int,int)),\
              this->classHelper, SLOT(moveClass(QTableWidgetItem*,int,int,int,int)) );
 
-    connect( this->m_pTableWidget->getHHeaderView(), SIGNAL(teacherMoved(int,int)), this, SLOT(moveTeacher(int,int)) );
+    connect( this->m_pTableWidget->getHHeaderView(), SIGNAL(teacherMoved(int,int)), \
+             this->teacherHelper, SLOT(moveTeacher(int,int)) );
 
     connect( this->m_pTableWidget->verticalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(vHeaderSelected(int)) );
 
@@ -118,6 +113,7 @@ void MainWindow::createMenu()
     redoAction->setShortcut( QKeySequence::Redo );
 
     this->classHelper = new ClassHelper(this->m_pTableWidget, this->m_undoStack);
+    this->teacherHelper = new TeacherHelper(this->m_pTableWidget, this->m_undoStack);
 
     editMenu->addAction( undoAction );
     editMenu->addAction( redoAction );
@@ -128,11 +124,12 @@ void MainWindow::createMenu()
     editMenu->addSeparator();
     editMenu->addAction( "&Delete Class", this->classHelper, SLOT(deleteClass()), QKeySequence::Delete );
 
-    //toolsMenu->addAction("&Add Teachers...", this, SLOT());
+    toolsMenu->addAction("&Add Teachers...", this, SLOT(createNewTeachersDialog()));
     toolsMenu->addSeparator();
     toolsMenu->addAction("E&xport to PDF", this, SLOT(tableToPDF()));
 
     viewMenu->addAction( "&Show Notes", this->classHelper, SLOT(showClass()) );
+    viewMenu->addAction( "&Show Stack", this, SLOT(showUndoStack()) );
 
     helpMenu->addAction( "&Instructions", this, SLOT(showHelp()), QKeySequence::HelpContents );
     editMenu->addSeparator();
@@ -320,7 +317,7 @@ void MainWindow::headerContextMenu(QPoint point)
 
     QTableWidgetItem *item = this->m_pTableWidget->itemAt(point);
     int clickedColumn = item->column();
-    QString headerName = this->m_HTableHeader.at(clickedColumn);
+    QString headerName = this->m_pTableWidget->HTableHeader().at(clickedColumn);
 
     headerName = headerName.remove("\n");
 
@@ -334,7 +331,8 @@ void MainWindow::headerContextMenu(QPoint point)
     {
         EditTeacherDialog *editDialog = new EditTeacherDialog(headerName, clickedColumn);
 
-        connect( editDialog, SIGNAL(editTeacherInput(QString,int)), this, SLOT(editTeacher(QString,int)) );
+        connect( editDialog, SIGNAL(editTeacherInput(QString,int)), \
+                 this->teacherHelper, SLOT(editTeacher(QString,int)) );
 
         editDialog->move(point);
         editDialog->showDialog();
@@ -343,7 +341,7 @@ void MainWindow::headerContextMenu(QPoint point)
     } else if ( clickedAction == deleteAction ) {
         this->m_undoStack->clear();
         this->m_pTableWidget->removeColumn(clickedColumn);
-        this->m_HTableHeader.removeAt(clickedColumn);
+        this->m_pTableWidget->HTableHeader().removeAt(clickedColumn);
     }
 }
 
@@ -384,16 +382,7 @@ void MainWindow::hHeaderSelected(int column)
     int visualIndex = this->m_pTableWidget->horizontalHeader()->visualIndex(column);
     if(visualIndex == 0)
     {
-        NewTeacherDialog *newTeach = new NewTeacherDialog;
-        connect( newTeach, SIGNAL(newTeacherInput(QTextEdit*)), this, \
-                 SLOT(createNewTeachers(QTextEdit*)) );
-
-
-        newTeach->setWindowTitle("Add teachers");
-        newTeach->move(geometry().center().x()-newTeach->geometry().width()/2, \
-                       geometry().center().y()-newTeach->geometry().height()/2);
-
-        newTeach->showDialog();
+        createNewTeachersDialog();
     }
 }
 
@@ -407,37 +396,52 @@ void MainWindow::vHeaderSelected(int row)
     rowGrades->showDialog();
 }
 
-void MainWindow::createNewTeachers(QTextEdit *inText)
+void MainWindow::createNewTeachersDialog()
 {
-    QString input = inText->toPlainText().toUpper();
-    if(input.length() < 1) { return; }
+    NewTeacherDialog *newTeach = new NewTeacherDialog;
+    connect( newTeach, SIGNAL(newTeacherInput(QTextEdit*)), this->teacherHelper, \
+             SLOT(createNewTeachers(QTextEdit*)) );
 
-    QStringList teacherNames = input.split( "," );
 
-    for(int i=0;i<teacherNames.length();i++)
-    {
-        if(teacherNames.at(i).length()>=18) {
-            QString replaceName = teacherNames.at(i);
-            int chopPoint = teacherNames.at(i).length()-18;
-            replaceName.chop(chopPoint);
-            teacherNames.replace(i, replaceName);
-        } else if(teacherNames.at(i).length()<1) {
-            teacherNames.removeAt(i);
-        }
-    }
+    newTeach->setWindowTitle("Add teachers");
+    newTeach->move(geometry().center().x()-newTeach->geometry().width()/2, \
+                   geometry().center().y()-newTeach->geometry().height()/2);
 
-    this->m_undoStack->push( new CommandTeacherAdd(&teacherNames, &this->m_HTableHeader, this->m_pTableWidget) );
+    newTeach->showDialog();
 }
 
-void MainWindow::editTeacher(QString headerAfter, int column)
-{
-    this->m_undoStack->push( new CommandTeacherEdit(column, headerAfter, this->m_pTableWidget, &this->m_HTableHeader));
-}
+//void MainWindow::createNewTeachers(QTextEdit *inText)
+//{
+//    QString input = inText->toPlainText().simplified().toUpper();
+//    if(input.length() < 1) { return; }
 
-void MainWindow::moveTeacher(int fromIndex, int toIndex)
-{
-    this->m_undoStack->push( new CommandTeacherMove(this->m_pTableWidget, fromIndex, toIndex));
-}
+//    QStringList teacherNames = input.split( "," );
+
+//    for(int i=0;i<teacherNames.length();i++)
+//    {
+//        if(teacherNames.at(i).length()>=18) {
+//            QString replaceName = teacherNames.at(i);
+//            int chopPoint = teacherNames.at(i).length()-18;
+//            replaceName.chop(chopPoint);
+//            teacherNames.replace(i, replaceName);
+//        } else if(teacherNames.at(i).length()<1) {
+//            teacherNames.removeAt(i);
+//        }
+//    }
+
+//    this->m_undoStack->push( new CommandTeacherAdd(&teacherNames, &this->m_pTableWidget->HTableHeader(), this->m_pTableWidget) );
+//}
+
+//void MainWindow::editTeacher(QString headerAfter, int column)
+//{
+//    this->m_undoStack->push( new CommandTeacherEdit(column, headerAfter, this->m_pTableWidget, \
+//                                                    &this->m_pTableWidget->HTableHeader()) );
+//}
+
+//void MainWindow::moveTeacher(int fromIndex, int toIndex)
+//{
+//    this->m_undoStack->push( new CommandTeacherMove(this->m_pTableWidget, fromIndex, toIndex));
+//}
 
 void MainWindow::editClassDialog()
 {
@@ -485,9 +489,7 @@ void MainWindow::createNewTable()
 
     this->m_pTableWidget->insertInstructions(this->m_pTableWidget);
 
-    this->m_HTableHeader.clear();
-    this->m_HTableHeader = this->m_pTableWidget->HTableHeader();
-    this->m_pTableWidget->setHorizontalHeaderLabels(this->m_HTableHeader);
+    this->m_pTableWidget->setHorizontalHeaderLabels(this->m_pTableWidget->HTableHeader());
 
     this->m_undoStack->clear();
 }
@@ -544,7 +546,7 @@ void MainWindow::saveToFile()
             visualhHeaders.append(this->m_pTableWidget->horizontalHeaderItem(logicalCol)->text());
         }
 
-        out << visualhHeaders << this->m_VTableHeader;
+        out << visualhHeaders << this->m_pTableWidget->VTableHeader();
 
         //table items by row then column
         for (int i=0; i<numRows; i++)
@@ -613,11 +615,11 @@ void MainWindow::loadFromFile()
         QStringList inHTableHeader, inVTableHeader;
 
         in >> inHTableHeader >> inVTableHeader;
-        this->m_HTableHeader = inHTableHeader;
-        this->m_VTableHeader = inVTableHeader;
+        this->m_pTableWidget->setHTableHeader(inHTableHeader);
+        this->m_pTableWidget->setVTableHeader(inVTableHeader);
 
-        this->m_pTableWidget->setHorizontalHeaderLabels(this->m_HTableHeader);
-        this->m_pTableWidget->setVerticalHeaderLabels(this->m_VTableHeader);
+        this->m_pTableWidget->setHorizontalHeaderLabels(this->m_pTableWidget->HTableHeader());
+        this->m_pTableWidget->setVerticalHeaderLabels(this->m_pTableWidget->VTableHeader());
 
         for (int i = 0; i < numRows; i++)
         {
@@ -632,6 +634,11 @@ void MainWindow::loadFromFile()
                    item->setText("wwwwwww");
                    this->m_pTableWidget->resizeColumnToContents(j);
                    item->setText(" \n \n ");
+               } else {
+                   QString grade = item->data(Qt::UserRole).toStringList().at(MainTableOptions::ClassGrade);
+
+                   this->m_pTableWidget->item(i, j)-> \
+                           setBackgroundColor(this->m_pTableWidget->TableOptions()->getGradeColor(grade));
                }
            }
            this->m_pTableWidget->resizeRowToContents(i);

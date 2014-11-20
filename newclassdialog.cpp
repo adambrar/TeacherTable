@@ -67,6 +67,8 @@ void NewClassDialog::getInput()
 {
     if( classNameInput->text() == "")
         classNameInput->setText("=======");
+    else
+        classNameInput->setText(classNameInput->text().simplified());
 
     QString *classGradeData = new QString;
     QString classGradeString = this->getGradeString(classGradeData);

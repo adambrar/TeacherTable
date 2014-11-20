@@ -23,6 +23,7 @@ public slots:
     void addCSVFile();
     void addExcelFile();
     void cancelAdd();
+    void keyPressEvent(QKeyEvent*);
 
 private:
     QTextEdit *inText;

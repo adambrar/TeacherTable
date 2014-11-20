@@ -1,17 +1,16 @@
 #include "commandteacheredit.h"
+#include "maintablewidget.h"
 
 #include <QStringList>
-#include <QTableWidget>
 #include <QHeaderView>
 
 CommandTeacherEdit::CommandTeacherEdit(int column, QString name, \
-                                       QTableWidget *m_pTableWidget, \
-                                       QStringList *m_pHTableHeader, QObject*)
+                                       MainTableWidget *m_pTableWidget, \
+                                       QObject*)
 {
     this->editedColumn = column;
-    this->headerBefore = m_pHTableHeader->at(column);
+    this->headerBefore = m_pTableWidget->HTableHeader().at(column);
     this->m_tableWidget = m_pTableWidget;
-    this->m_HTableHeader = m_pHTableHeader;
 
     QString formattedName;
 
@@ -33,12 +32,16 @@ CommandTeacherEdit::~CommandTeacherEdit()
 
 void CommandTeacherEdit::undo()
 {
-    this->m_HTableHeader->replace(editedColumn, headerBefore);
-    this->m_tableWidget->setHorizontalHeaderLabels(*this->m_HTableHeader);
+    QStringList tmpList = this->m_tableWidget->HTableHeader();
+    tmpList.replace(this->editedColumn, this->headerBefore);
+    this->m_tableWidget->setHTableHeader(tmpList);
+    this->m_tableWidget->setHorizontalHeaderLabels(tmpList);
 }
 
 void CommandTeacherEdit::redo()
 {
-    this->m_HTableHeader->replace(editedColumn, headerAfter);
-    this->m_tableWidget->setHorizontalHeaderLabels(*this->m_HTableHeader);
+    QStringList tmpList = this->m_tableWidget->HTableHeader();
+    tmpList.replace(this->editedColumn, this->headerAfter);
+    this->m_tableWidget->setHTableHeader(tmpList);
+    this->m_tableWidget->setHorizontalHeaderLabels(tmpList);
 }

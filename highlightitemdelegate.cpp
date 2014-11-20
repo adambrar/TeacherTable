@@ -24,19 +24,19 @@ void HighlightItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         pen.setWidth(4);
 
         if( data == "Highlight 1") {
-            pen.setColor( QColor(4,86,232) );
+            pen.setColor( QColor(255,201,138) );
             painter->setPen(pen);
             painter->drawRect(option.rect);
         } else if( data == "Highlight 2") {
-            pen.setColor( QColor(13,9,255) );
+            pen.setColor( QColor(232,117,174) );
             painter->setPen(pen);
             painter->drawRect(option.rect);
         } else if( data == "Highlight 3") {
-            pen.setColor( QColor(98,4,232) );
+            pen.setColor( QColor(143,141,255) );
             painter->setPen(pen);
             painter->drawRect(option.rect);
         } else if( data == "Highlight 4") {
-            pen.setColor( QColor(206,4,255) );
+            pen.setColor( QColor(117,232,201) );
             painter->setPen(pen);
             painter->drawRect(option.rect);
         }

@@ -33,6 +33,8 @@ public:
 
     QStringList HTableHeader() const;
     void setHTableHeader(const QStringList &HTableHeader);
+    void HTableHeaderAppend(const QString name);
+    void HTableHeaderRemoveLast();
 
     QStringList VTableHeader() const;
     void setVTableHeader(const QStringList &VTableHeader);
