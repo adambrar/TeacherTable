@@ -3,10 +3,11 @@
 #include "newclassdialog.h"
 #include "editteacherdialog.h"
 #include "commandclassdelete.h"
-#include "commandteacheradd.h"
-#include "commandteacherdelete.h"
-#include "commandteacheredit.h"
-#include "commandteachermove.h"
+//#include "commandteacheradd.h"
+//#include "commandteacherdelete.h"
+//#include "commandteacheredit.h"
+//#include "commandteachermove.h"
+#include "edittabletitledialog.h"
 #include "horizontalheaderview.h"
 #include "highlightitemdelegate.h"
 #include "maintablewidget.h"
@@ -46,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->m_undoView = 0;
 
     this->m_pTableWidget = new MainTableWidget(this);
-    this->m_tableTitle = new QLabel("School Timetable - version 1");
+    this->m_tableTitle = new QLabel("My Timetable");
     this->m_tableTitle->setAlignment(Qt::AlignCenter);
 
     if (this->m_tableTitle->fontInfo().pointSize() != -1) {
@@ -61,12 +62,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->mainWidget = new QWidget();
 
-    this->m_verticalWindowLayout = new QVBoxLayout;
-    this->m_verticalWindowLayout->addWidget(this->m_tableTitle);
-    this->m_verticalWindowLayout->addWidget(this->m_pTableWidget);
-    mainWidget->setLayout(this->m_verticalWindowLayout);
+    QVBoxLayout *verticalWindowLayout = new QVBoxLayout;
+    verticalWindowLayout->addWidget(this->m_tableTitle);
+    verticalWindowLayout->addWidget(this->m_pTableWidget);
+    mainWidget->setLayout(verticalWindowLayout);
 
-    this->setCentralWidget(mainWidget);
+    this->setCentralWidget(this->mainWidget);
 
     this->m_pTableWidget->initTableWidget(m_pTableWidget);
     this->m_pTableWidget->insertInstructions( m_pTableWidget );
@@ -89,12 +90,13 @@ MainWindow::MainWindow(QWidget *parent)
              this, SLOT(headerContextMenu(QPoint)) );
 
     connect( this->m_pTableWidget, SIGNAL(classMoved(QTableWidgetItem*,int,int,int,int)),\
-             this->classHelper, SLOT(moveClass(QTableWidgetItem*,int,int,int,int)) );
+             this->m_classHelper, SLOT(moveClass(QTableWidgetItem*,int,int,int,int)) );
 
     connect( this->m_pTableWidget->getHHeaderView(), SIGNAL(teacherMoved(int,int)), \
-             this->teacherHelper, SLOT(moveTeacher(int,int)) );
+             this->m_teacherHelper, SLOT(moveTeacher(int,int)) );
 
-    connect( this->m_pTableWidget->verticalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(vHeaderSelected(int)) );
+    connect( this->m_pTableWidget->verticalHeader(), SIGNAL(sectionClicked(int)), \
+             this, SLOT(vHeaderSelected(int)) );
 
     this->m_pTableWidget->setCopiedItem( new QTableWidgetItem(QString(" \n \n ")) );
     this->m_pTableWidget->setFocus();
@@ -104,8 +106,15 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    this->m_undoStack->clear();
+
     delete this->m_pTableWidget;
     delete this->m_undoStack;
+    delete this->m_classHelper;
+    delete this->m_teacherHelper;
+    delete this->m_tableTitle;
+    delete this->m_saveFileName;
+    delete this->mainWidget;
 }
 
 void MainWindow::createMenu()
@@ -133,24 +142,26 @@ void MainWindow::createMenu()
     undoAction->setShortcut( QKeySequence::Undo );
     redoAction->setShortcut( QKeySequence::Redo );
 
-    this->classHelper = new ClassHelper(this->m_pTableWidget, this->m_undoStack);
-    this->teacherHelper = new TeacherHelper(this->m_pTableWidget, this->m_undoStack);
+    this->m_classHelper = new ClassHelper(this->m_pTableWidget, this->m_undoStack);
+    this->m_teacherHelper = new TeacherHelper(this->m_pTableWidget, this->m_undoStack);
 
     editMenu->addAction( undoAction );
     editMenu->addAction( redoAction );
     editMenu->addSeparator();
     editMenu->addAction( "&Edit Class", this, SLOT(editClassDialog()) );
-    editMenu->addAction( "&Copy Class", this->classHelper, SLOT(copyClass()), QKeySequence::Copy );
-    editMenu->addAction( "&Paste Class", this->classHelper, SLOT(pasteClass()), QKeySequence::Paste );
+    editMenu->addAction( "&Copy Class", this->m_classHelper, SLOT(copyClass()), QKeySequence::Copy );
+    editMenu->addAction( "&Paste Class", this->m_classHelper, SLOT(pasteClass()), QKeySequence::Paste );
     editMenu->addSeparator();
-    editMenu->addAction( "&Delete Class", this->classHelper, SLOT(deleteClass()), QKeySequence::Delete );
+    editMenu->addAction( "&Delete Class", this->m_classHelper, SLOT(deleteClass()), QKeySequence::Delete );
 
     toolsMenu->addAction("&Add Teachers...", this, SLOT(createNewTeachersDialog()));
     toolsMenu->addSeparator();
     toolsMenu->addAction("E&xport to PDF", this, SLOT(tableToPDF()));
+    toolsMenu->addSeparator();
+    toolsMenu->addAction("Edit Title", this, SLOT(createChangeTitleDialog()));
 
-    viewMenu->addAction( "&Show Notes", this->classHelper, SLOT(showClass()) );
-    viewMenu->addAction( "&Show Stack", this, SLOT(showUndoStack()) );
+    viewMenu->addAction( "&Show Notes", this->m_classHelper, SLOT(showClass()) );
+    viewMenu->addAction( "Show Stac&k", this, SLOT(showUndoStack()) );
 
     helpMenu->addAction( "&Instructions", this, SLOT(showHelp()), QKeySequence::HelpContents );
     editMenu->addSeparator();
@@ -266,6 +277,20 @@ void MainWindow::tableToPDF()
     QMessageBox::information(this, "Done!", "Finished exporting table.");
 }
 
+void MainWindow::createChangeTitleDialog()
+{
+    EditTableTitleDialog *titleDialog = new EditTableTitleDialog(this->m_tableTitle->text());
+    titleDialog->setWindowTitle("Edit Table Title");
+    titleDialog->move(this->geometry().center().x(), this->geometry().center().y());
+    connect(titleDialog, SIGNAL(changeTitle(QString)), this, SLOT(tableTitleChanged(QString)));
+    titleDialog->showDialog();
+}
+
+void MainWindow::tableTitleChanged(QString newTitle)
+{
+    this->m_tableTitle->setText(newTitle);
+}
+
 void MainWindow::cellContextMenu(QPoint point)
 {
     QTableWidgetItem *clickedItem = this->m_pTableWidget->itemAt(point);
@@ -321,14 +346,14 @@ void MainWindow::cellContextMenu(QPoint point)
                                                   clickedItem->column(), \
                                                   clickedItem, this->m_pTableWidget) );
     } else if ( clickedAction == viewAction ) {
-        this->classHelper->showClass();
+        this->m_classHelper->showClass();
     } else if ( clickedAction == copyAction ) {
-        this->classHelper->copyClass();
+        this->m_classHelper->copyClass();
     } else if ( clickedAction == pasteAction ) {
-        this->classHelper->pasteClass();
+        this->m_classHelper->pasteClass();
     } else if ( highlighterActions.contains(clickedAction) ) {
         QString actionText = clickedAction->text();
-        this->classHelper->highlightClass( clickedItem->row(), clickedItem->column(), \
+        this->m_classHelper->highlightClass( clickedItem->row(), clickedItem->column(), \
                         actionText );
     }
 }
@@ -358,9 +383,10 @@ void MainWindow::headerContextMenu(QPoint point)
         EditTeacherDialog *editDialog = new EditTeacherDialog(headerName, clickedColumn);
 
         connect( editDialog, SIGNAL(editTeacherInput(QString,int)), \
-                 this->teacherHelper, SLOT(editTeacher(QString,int)) );
+                 this->m_teacherHelper, SLOT(editTeacher(QString,int)) );
 
         editDialog->move(point);
+        editDialog->setWindowTitle("Edit Teacher");
         editDialog->showDialog();
 
 
@@ -381,7 +407,7 @@ void MainWindow::cellDoubleClicked(int nRow, int nCol)
         newClass = new NewClassDialog(nRow, nCol);
         newClass->setWindowTitle("Add A Class");
         connect( newClass, SIGNAL(newClassInput(QTableWidgetItem*, int, int)), \
-                 this->classHelper, SLOT(setClass(QTableWidgetItem*, int, int)) );
+                 this->m_classHelper, SLOT(setClass(QTableWidgetItem*, int, int)) );
 
     } else {
         QList<QVariant> data = clickedItem->data(Qt::UserRole).toList();
@@ -393,7 +419,7 @@ void MainWindow::cellDoubleClicked(int nRow, int nCol)
                                        data.at(MainTableOptions::ClassNotes).toString());
         newClass->setWindowTitle("Edit A Class");
         connect( newClass, SIGNAL(newClassInput(QTableWidgetItem*, int, int)), \
-                 this->classHelper, SLOT(editClass(QTableWidgetItem*, int, int)) );
+                 this->m_classHelper, SLOT(editClass(QTableWidgetItem*, int, int)) );
 
     }
 
@@ -425,7 +451,7 @@ void MainWindow::vHeaderSelected(int row)
 void MainWindow::createNewTeachersDialog()
 {
     NewTeacherDialog *newTeach = new NewTeacherDialog;
-    connect( newTeach, SIGNAL(newTeacherInput(QTextEdit*)), this->teacherHelper, \
+    connect( newTeach, SIGNAL(newTeacherInput(QTextEdit*)), this->m_teacherHelper, \
              SLOT(createNewTeachers(QTextEdit*)) );
 
 
@@ -458,7 +484,7 @@ void MainWindow::editClassDialog()
                                this);
 
     connect( editWindow , SIGNAL(newClassInput(QTableWidgetItem*, int, int)), \
-             this->classHelper, SLOT(editClass(QTableWidgetItem*, int, int)) );
+             this->m_classHelper, SLOT(editClass(QTableWidgetItem*, int, int)) );
 
     editWindow->setWindowTitle("Edit Class");
     editWindow->showDialog();

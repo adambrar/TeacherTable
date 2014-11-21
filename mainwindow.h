@@ -41,8 +41,10 @@ private slots:
     void printTable();
     void tableToPDF();
 
-    void editClassDialog();
+    void createChangeTitleDialog();
+    void tableTitleChanged(QString);
 
+    void editClassDialog();
     void createNewTeachersDialog();
 
     void createNewTable();
@@ -69,11 +71,10 @@ private:
     QString *m_saveFileName;
 
     QLabel *m_tableTitle;
-    QVBoxLayout *m_verticalWindowLayout;
     QWidget *mainWidget;
 
-    ClassHelper *classHelper;
-    TeacherHelper *teacherHelper;
+    ClassHelper *m_classHelper;
+    TeacherHelper *m_teacherHelper;
 };
 
 #endif // MAINWINDOW_H

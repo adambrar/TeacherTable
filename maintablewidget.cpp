@@ -27,11 +27,15 @@ MainTableWidget::MainTableWidget(QWidget *parent) :
     this->setHorizontalHeader( hHeaderView );
     this->blackoutColumns = 1;
     this->tableOptions = new MainTableOptions;
+    this->movingItem = NULL;
 }
 
 MainTableWidget::~MainTableWidget()
 {
     delete this->hHeaderView;
+    delete this->tableOptions;
+    delete this->copiedItem;
+    delete this->movingItem;
 }
 
 void MainTableWidget::mouseMoveEvent(QMouseEvent *event)

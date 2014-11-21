@@ -32,7 +32,6 @@ EditTeacherDialog::EditTeacherDialog(QString teacherName, int clickedColumn, QWi
     connect( cancelButton, SIGNAL(clicked()), this, SLOT(cancelEdit()) );
 
     setLayout(formLayout);
-
 }
 
 EditTeacherDialog::~EditTeacherDialog()
