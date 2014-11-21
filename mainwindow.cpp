@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->validateString = QString("This is a valid TeacherTable!");
 
     this->m_pTableWidget = new MainTableWidget(this);
-    this->m_tableTitle = new QLabel("My Timetable");
+    this->m_tableTitle = new QLabel("My Table");
     this->m_tableTitle->setAlignment(Qt::AlignCenter);
 
     if (this->m_tableTitle->fontInfo().pointSize() != -1) {
@@ -159,10 +159,10 @@ void MainWindow::createMenu()
     toolsMenu->addSeparator();
     toolsMenu->addAction("E&xport to PDF", this, SLOT(tableToPDF()));
     toolsMenu->addSeparator();
-    toolsMenu->addAction("Edit Title", this, SLOT(createChangeTitleDialog()));
+    toolsMenu->addAction("Edit Table Title", this, SLOT(createChangeTitleDialog()));
 
     viewMenu->addAction( "&Show Notes", this->m_classHelper, SLOT(showClass()) );
-    viewMenu->addAction( "Show Stac&k", this, SLOT(showUndoStack()) );
+    //viewMenu->addAction( "Show Stac&k", this, SLOT(showUndoStack()) );
 
     helpMenu->addAction( "&Instructions", this, SLOT(showHelp()), QKeySequence::HelpContents );
     editMenu->addSeparator();
@@ -192,19 +192,41 @@ void MainWindow::printTable()
 
     QString date = QDate::currentDate().toString("dddd dd, MMMM, yyyy");
     QLabel dateLabel(date);
+    dateLabel.setStyleSheet("QLabel { background-color : white; color : black }");
     QPixmap grabDateLabel = dateLabel.grab();
+
+    QLabel tableTitle(this->m_tableTitle->text());
+    tableTitle.setStyleSheet("QLabel { background-color : white; color : black }");
+
+    QFont font(tableTitle.font());
+    if (tableTitle.fontInfo().pointSize() != -1) {
+        font.setPointSize(tableTitle.font().pointSize()+6);
+    } else if (tableTitle.fontInfo().pixelSize() != -1) {
+        font.setPixelSize(tableTitle.font().pixelSize()+10);
+    }
+    tableTitle.setFont(font);
+    tableTitle.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+
+    QPixmap grabTableTitle = tableTitle.grab();
 
     QPainter painter;
     painter.begin(&printer);
     for(int i=0;i<tempTables.size();i++)
     {
-        QPixmap grabMap = tempTables.at(i)->grab();
+        tempTables.at(i)->setStyleSheet("QHeaderView::section { background-color : white } \
+                                                   QHeaderView { background-color : white }");
+        QPixmap grabTableMap = tempTables.at(i)->grab();
 
         QLabel pageLabel(QString("Page %1 of %2").arg(i+1).arg(tempTables.size()));
         QPixmap grabPageLabel = pageLabel.grab();
 
-        painter.drawPixmap(10, 0, tempTables.at(i)->width(), \
-                           printer.pageRect().height()-grabPageLabel.height(), grabMap);
+        painter.drawPixmap(printer.pageRect().width()/2-grabTableTitle.width()/2, \
+                           0, grabTableTitle.width(), \
+                           grabTableTitle.height(), grabTableTitle);
+
+        painter.drawPixmap(10, grabTableTitle.height(), tempTables.at(i)->width(), \
+                           printer.pageRect().height()-grabPageLabel.height()-grabTableTitle.height(), \
+                           grabTableMap);
 
         painter.drawPixmap(0, printer.pageRect().height()-grabPageLabel.height(), \
                            grabPageLabel.width(), grabPageLabel.height(), grabPageLabel);
@@ -242,33 +264,57 @@ void MainWindow::tableToPDF()
     QList<MainTableWidget*> tempTables = this->m_pTableWidget-> \
                                     createPrintableTable(printer.pageRect().width());
 
+    //date display
     QString date = QDate::currentDate().toString("dddd dd, MMMM, yyyy");
     QLabel dateLabel(date);
+    dateLabel.setStyleSheet("QLabel { background-color : white; color : black }");
     QPixmap grabDateLabel = dateLabel.grab();
+    //
+    //table title display
+    QLabel tableTitle(this->m_tableTitle->text());
+    tableTitle.setStyleSheet("QLabel { background-color : white; color : black }");
 
-    QPixmap grabTableTitle = this->m_tableTitle->grab();
+    QFont font(tableTitle.font());
+    if (tableTitle.fontInfo().pointSize() != -1) {
+        font.setPointSize(tableTitle.font().pointSize()+6);
+    } else if (tableTitle.fontInfo().pixelSize() != -1) {
+        font.setPixelSize(tableTitle.font().pixelSize()+10);
+    }
+    tableTitle.setFont(font);
+    tableTitle.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+
+    QPixmap grabTableTitle = tableTitle.grab();
+    //
+    //page number display
+    QLabel pageLabel;
+    pageLabel.setStyleSheet("QLabel { background-color : white; color : black }");
+    //
 
     QPainter painter;
     painter.begin(&printer);
     for(int i=0;i<tempTables.size();i++)
     {
-        QPixmap grabMap = tempTables.at(i)->grab();
+        QPixmap grabTableMap = tempTables.at(i)->grab();
 
-        QLabel pageLabel(QString("Page %1 of %2").arg(i+1).arg(tempTables.size()));
+        pageLabel.setText(QString("Page %1 of %2").arg(i+1).arg(tempTables.size()));
         QPixmap grabPageLabel = pageLabel.grab();
 
-        painter.drawPixmap(10, 0, printer.pageRect().width(), \
+        painter.drawPixmap(printer.pageRect().width()/2-grabTableTitle.width()/2, \
+                           0, grabTableTitle.width(), \
                            grabTableTitle.height(), grabTableTitle);
 
         painter.drawPixmap(10, grabTableTitle.height(), tempTables.at(i)->width(), \
-                           printer.pageRect().height()-grabPageLabel.height(), grabMap);
+                           printer.pageRect().height()-grabPageLabel.height()-grabTableTitle.height()-2, \
+                           grabTableMap);
 
         painter.drawPixmap(0, printer.pageRect().height()-grabPageLabel.height(), \
-                           grabPageLabel.width(), grabPageLabel.height(), grabPageLabel);
+                           grabPageLabel.width(), grabPageLabel.height(), \
+                           grabPageLabel);
 
         painter.drawPixmap(printer.pageRect().width()-grabDateLabel.width(), \
                            printer.pageRect().height()-grabDateLabel.height(), \
-                           grabDateLabel.width(), grabPageLabel.height(), grabDateLabel);
+                           grabDateLabel.width(), grabPageLabel.height(), \
+                           grabDateLabel);
 
         if(i != tempTables.size()-1)
             printer.newPage();
@@ -493,7 +539,7 @@ void MainWindow::editClassDialog()
 
 void MainWindow::showHelp()
 {
-    QMessageBox::about(this, "TeacherTable", "TeacherTable version 1.0.\n\nGo to www.vpd29772.vps.ovh.ca for help and updates.");
+    QMessageBox::about(this, "TeacherTable", "TeacherTable version 1.5.0.5014.\n\nGo to www.vpd29772.vps.ovh.ca for help and updates.");
 }
 
 void MainWindow::showQtHelp()
@@ -506,8 +552,10 @@ void MainWindow::createNewTable()
     this->m_tableTitle->setText("My Table");
 
     this->m_pTableWidget->setColumnCount(1);
-    this->m_pTableWidget->HTableHeader().clear();
-    this->m_pTableWidget->HTableHeader()<<" \n \n \nA\nD\nD\n \nT\nE\nA\nC\nH\nE\nR\n \n ";
+
+    this->m_pTableWidget->HTableHeaderClear();
+
+    this->m_pTableWidget->HTableHeaderAppend(" \n \n \nA\nD\nD\n \nT\nE\nA\nC\nH\nE\nR\n \n ");
 
     this->m_pTableWidget->insertInstructions(this->m_pTableWidget);
 
@@ -632,8 +680,8 @@ void MainWindow::loadFromFile()
         in >> fileValidate;
 
         if(fileValidate != this->validateString) {
-            QMessageBox::information(this, "Warning", "Invalid file format. Double check the \
-                                     name and location of the file you are loading.");
+            QMessageBox::information(this, "Warning", \
+                                     "Invalid file format. Double check the name and location of the file you are loading.");
             return;
         }
 
@@ -666,8 +714,10 @@ void MainWindow::loadFromFile()
         this->m_pTableWidget->setHTableHeader(inHTableHeader);
         this->m_pTableWidget->setVTableHeader(inVTableHeader);
 
+        int height = this->m_pTableWidget->horizontalHeader()->height();
         this->m_pTableWidget->setHorizontalHeaderLabels(this->m_pTableWidget->HTableHeader());
         this->m_pTableWidget->setVerticalHeaderLabels(this->m_pTableWidget->VTableHeader());
+        this->m_pTableWidget->horizontalHeader()->setFixedHeight(height);
 
         for (int i = 0; i < numRows; i++)
         {

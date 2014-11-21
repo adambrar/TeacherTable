@@ -125,6 +125,7 @@ QList<MainTableWidget*> MainTableWidget::createPrintableTable(int pageWidth)
         tempTables.at(page)->resize(width, height);
 
         tempTables.at(page)->setFocusPolicy(Qt::NoFocus);
+
         if(tempTables.at(page)->columnCount()<1)
             tempTables.removeAt(page);
     }
@@ -151,6 +152,7 @@ void MainTableWidget::initTableWidget( QTableWidget *m_pTableWidget )
     m_pTableWidget->horizontalHeader()->setSectionsClickable(true);
 
     m_pTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    m_pTableWidget->horizontalHeader()->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     m_pTableWidget->horizontalHeader()->setDragEnabled(true);
     m_pTableWidget->horizontalHeader()->setSectionsMovable(true);
@@ -159,6 +161,7 @@ void MainTableWidget::initTableWidget( QTableWidget *m_pTableWidget )
     m_pTableWidget->horizontalHeader()->setSelectionBehavior(QAbstractItemView::SelectColumns);
 
     m_pTableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    m_pTableWidget->verticalHeader()->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     m_pTableWidget->verticalHeader()->setSectionsClickable(true);
 
     m_pTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -241,6 +244,11 @@ void MainTableWidget::HTableHeaderAppend(const QString name)
 void MainTableWidget::HTableHeaderRemoveLast()
 {
     this->m_HTableHeader.removeLast();
+}
+
+void MainTableWidget::HTableHeaderClear()
+{
+    this->m_HTableHeader.clear();
 }
 
 QStringList MainTableWidget::VTableHeader() const

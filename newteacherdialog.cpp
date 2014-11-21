@@ -18,8 +18,8 @@ NewTeacherDialog::NewTeacherDialog(QWidget *parent) :
     this->inText = new QTextEdit;
     f_layout->addRow( new QLabel( QString("Enter the names " \
                                           "of teachers to add.\nEnter " \
-                                          "each teacher separated by a comma." \
-                                          ) ), inText );
+                                          "each teacher separated by a comma.\n \
+                                          Teacher names must be less than \n18 letters") ), inText );
     QPushButton *addTeacherButton = new QPushButton( QString("Done Adding") );
     addTeacherButton->setDefault(true);
 

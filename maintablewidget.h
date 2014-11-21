@@ -35,6 +35,7 @@ public:
     void setHTableHeader(const QStringList &HTableHeader);
     void HTableHeaderAppend(const QString name);
     void HTableHeaderRemoveLast();
+    void HTableHeaderClear();
 
     QStringList VTableHeader() const;
     void setVTableHeader(const QStringList &VTableHeader);
