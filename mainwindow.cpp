@@ -45,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     this->m_undoStack = new QUndoStack(this);
     this->m_undoView = 0;
+    this->validateString = QString("This is a valid TeacherTable!");
 
     this->m_pTableWidget = new MainTableWidget(this);
     this->m_tableTitle = new QLabel("My Timetable");
@@ -502,9 +503,11 @@ void MainWindow::showQtHelp()
 
 void MainWindow::createNewTable()
 {
+    this->m_tableTitle->setText("My Table");
+
     this->m_pTableWidget->setColumnCount(1);
     this->m_pTableWidget->HTableHeader().clear();
-    this->m_pTableWidget->HTableHeader()<<"A\nD\nD\n \nT\nE\nA\nC\nH\nE\nR";
+    this->m_pTableWidget->HTableHeader()<<" \n \n \nA\nD\nD\n \nT\nE\nA\nC\nH\nE\nR\n \n ";
 
     this->m_pTableWidget->insertInstructions(this->m_pTableWidget);
 
@@ -526,7 +529,11 @@ void MainWindow::showUndoStack()
 
 QSize MainWindow::getWindowSize()
 {
-    return this->m_pTableWidget->getTableSize(this->m_pTableWidget);
+    QSize tableSize = this->m_pTableWidget->getTableSize(this->m_pTableWidget);
+
+    tableSize.setHeight(this->m_tableTitle->height()+tableSize.height());
+
+    return tableSize;
 }
 
 void MainWindow::saveToFile()
@@ -552,11 +559,18 @@ void MainWindow::saveToFile()
 
         QDataStream out(&file);
 
+        //string to validate file
+        out << this->validateString;
+
+        //table title
+        out << this->m_tableTitle->text();
+
         //table size
         qint32 numRows = this->m_pTableWidget->rowCount();
         qint32 numCols = this->m_pTableWidget->columnCount();
         out << numRows << numCols;
 
+        //horizontal headers...teacher names
         QStringList visualhHeaders;
 
         for(int i=0; i<numCols; i++)
@@ -565,6 +579,7 @@ void MainWindow::saveToFile()
             visualhHeaders.append(this->m_pTableWidget->horizontalHeaderItem(logicalCol)->text());
         }
 
+        //vertical headers...blocks
         out << visualhHeaders << this->m_pTableWidget->VTableHeader();
 
         //table items by row then column
@@ -612,7 +627,21 @@ void MainWindow::loadFromFile()
         QDataStream in(&file);
         in.setVersion(QDataStream::Qt_4_5);
 
+        //check for valid teachertable file
+        QString fileValidate;
+        in >> fileValidate;
+
+        if(fileValidate != this->validateString) {
+            QMessageBox::information(this, "Warning", "Invalid file format. Double check the \
+                                     name and location of the file you are loading.");
+            return;
+        }
+
         createNewTable();
+
+        QString tableTitle;
+        in >> tableTitle;
+        this->m_tableTitle->setText(tableTitle);
 
         qint32 numRows, numCols;
         in >> numRows >> numCols;
@@ -677,7 +706,5 @@ void MainWindow::loadFromFile()
 
 void MainWindow::closeWindow()
 {
-    this->m_undoStack->clear();
-
     this->close();
 }

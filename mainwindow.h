@@ -75,6 +75,8 @@ private:
 
     ClassHelper *m_classHelper;
     TeacherHelper *m_teacherHelper;
+
+    QString validateString;
 };
 
 #endif // MAINWINDOW_H
