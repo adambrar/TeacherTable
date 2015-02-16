@@ -72,8 +72,19 @@ void CommandTeacherAdd::redo()
             newItem->setData(Qt::UserRole, (QVariant)QString("1"));
             newItem->setBackground(Qt::white);
 
-            m_tableWidget->setItem(row, m_tableWidget->columnCount() - 1, newItem);
+            //insert black column
+            if(row == 4)
+            {
+                newItem->setText(QString(" "));
 
+                newItem->setFlags(newItem->flags() & ~Qt::ItemIsEnabled & ~Qt::ItemIsDropEnabled);
+                newItem->setData(Qt::UserRole, (QVariant)QString("0"));
+                newItem->setBackground(Qt::gray);
+
+            }
+
+            m_tableWidget->setItem(row, m_tableWidget->columnCount() - 1, newItem);
+            m_tableWidget->resizeRowToContents(row);
         }
     }
     m_tableWidget->setHorizontalHeaderLabels(m_tableWidget->HTableHeader());

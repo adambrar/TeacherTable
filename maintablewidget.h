@@ -25,7 +25,7 @@ public:
     void initTableWidget( QTableWidget* );
     void insertInstructions( QTableWidget* );
 
-    int numBlocks() { return 8; }
+    int numBlocks() { return 9; }
     int numExtraBlocks() { return 2; }
     QSize getTableSize(MainTableWidget*);
 
@@ -71,6 +71,7 @@ private:
 
     HorizontalHeaderView *hHeaderView;
     int blackoutColumns;
+    int blackRowNumber;
 
     MainTableOptions *tableOptions;
 };

@@ -74,7 +74,7 @@ void NewClassDialog::getInput()
     QString classGradeString = this->getGradeString(classGradeData);
 
     if(classSectionInput->text() == "")
-        classSectionInput->setText("0");
+        classSectionInput->setText("1");
 
     QTableWidgetItem* newItem = createClass(classNameInput->text().toUpper(), classGradeString, *classGradeData, \
                                             classSectionInput->text(), classAdditionalNotes->toPlainText());

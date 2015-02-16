@@ -32,6 +32,7 @@ public:
     int numBlocks() { return 8; }
     int numExtraBlocks() { return 2; }
     QSize getWindowSize();
+    void loadFile(QString file) { loadFromFile(file); }
 
 private slots:
     void hHeaderSelected(int);
@@ -54,7 +55,7 @@ private slots:
 
     void saveToFile();
     void saveAsToFile();
-    void loadFromFile();
+    void loadFromFile(QString fileName="");
 
     void showHelp();
     void showQtHelp();
@@ -77,6 +78,8 @@ private:
     TeacherHelper *m_teacherHelper;
 
     QString validateString;
+
+    int blackRowNum;
 };
 
 #endif // MAINWINDOW_H

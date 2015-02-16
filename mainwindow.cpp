@@ -103,6 +103,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->m_pTableWidget->setFocus();
 
     this->m_saveFileName = new QString("");
+    this->blackRowNum = 4;
 }
 
 MainWindow::~MainWindow()
@@ -539,7 +540,7 @@ void MainWindow::editClassDialog()
 
 void MainWindow::showHelp()
 {
-    QMessageBox::about(this, "TeacherTable", "TeacherTable version 1.5.0.5014.\n\nGo to www.vpd29772.vps.ovh.ca for help and updates.");
+    QMessageBox::about(this, "TeacherTable", "TeacherTable version 1.5.0.5014.\n\nGo to www.teachertables.xyz for help and updates.");
 }
 
 void MainWindow::showQtHelp()
@@ -653,11 +654,14 @@ void MainWindow::saveAsToFile()
     saveToFile();
 }
 
-void MainWindow::loadFromFile()
+void MainWindow::loadFromFile(QString fileName)
 {
-    QString fileName = QFileDialog::getOpenFileName(this,
-        tr("Open TimeTable"), *this->m_saveFileName,
-        tr("TimeTable (*.ttl);;All Files (*)"));
+    //open file
+    if(fileName == "") {
+        fileName = QFileDialog::getOpenFileName(this,
+            tr("Open TimeTable"), *this->m_saveFileName,
+            tr("TimeTable (*.ttl);;All Files (*)"));
+    }
 
     if (fileName.isEmpty())
         return;
@@ -687,6 +691,7 @@ void MainWindow::loadFromFile()
 
         createNewTable();
 
+        //initialize table with title, rows, cols, instructions and delegates
         QString tableTitle;
         in >> tableTitle;
         this->m_tableTitle->setText(tableTitle);
@@ -708,18 +713,28 @@ void MainWindow::loadFromFile()
             m_pTableWidget->setItemDelegateForColumn( col, new HighlightItemDelegate(this->m_pTableWidget) );
         }
 
+        //input headers
         QStringList inHTableHeader, inVTableHeader;
 
         in >> inHTableHeader >> inVTableHeader;
         this->m_pTableWidget->setHTableHeader(inHTableHeader);
         this->m_pTableWidget->setVTableHeader(inVTableHeader);
 
+        //set vertical header at end to account for added rows
         int height = this->m_pTableWidget->horizontalHeader()->height();
         this->m_pTableWidget->setHorizontalHeaderLabels(this->m_pTableWidget->HTableHeader());
         this->m_pTableWidget->setVerticalHeaderLabels(this->m_pTableWidget->VTableHeader());
         this->m_pTableWidget->horizontalHeader()->setFixedHeight(height);
 
-        for (int i = 0; i < numRows; i++)
+        //remove black column of old table
+        if( numRows != this->m_pTableWidget->numBlocks()+this->m_pTableWidget->numExtraBlocks() ) {
+            this->m_pTableWidget->removeRow(this->blackRowNum);
+            this->m_pTableWidget->setRowCount(this->m_pTableWidget->rowCount()+1);
+
+        }
+
+        //insert all items
+        for (int i = 0; i < this->m_pTableWidget->rowCount(); i++)
         {
            for (int j = 1; j < numCols; j++)
            {
@@ -733,21 +748,41 @@ void MainWindow::loadFromFile()
                    this->m_pTableWidget->resizeColumnToContents(j);
                    item->setText(" \n \n ");
                } else {
-                   QString grade = item->data(Qt::UserRole).toStringList().at(MainTableOptions::ClassGrade);
+                   QString grade = item->data(Qt::UserRole).toStringList().at(
+                               MainTableOptions::ClassGrade);
 
                    this->m_pTableWidget->item(i, j)-> \
-                           setBackgroundColor(this->m_pTableWidget->TableOptions()->getGradeColor(grade));
+                           setBackgroundColor(this->m_pTableWidget->TableOptions()->getGradeColor(
+                                                  grade));
                }
            }
-           this->m_pTableWidget->resizeRowToContents(i);
         }
+        this->m_pTableWidget->resizeRowsToContents();
 
-        for (int row = 0; row < m_pTableWidget->rowCount(); row++)
-        {
-            QTableWidgetItem *newItem = this->m_pTableWidget->item(row, 0)->clone();
-            newItem->setFlags(newItem->flags() & ~Qt::ItemIsSelectable & ~Qt::ItemIsDropEnabled \
-                              & ~Qt::ItemIsEnabled & ~Qt::ItemIsDragEnabled);
-            this->m_pTableWidget->setItem(row, 0, newItem);
+        //reinsert black column
+        if( numRows != this->m_pTableWidget->numBlocks()+this->m_pTableWidget->numExtraBlocks() ) {
+            this->m_pTableWidget->insertRow(this->blackRowNum);
+
+            for (int j = 1; j < numCols; j++)
+            {
+                QTableWidgetItem *newItem = new QTableWidgetItem;
+                newItem->setText(QString(" "));
+
+                newItem->setFlags(newItem->flags() & ~Qt::ItemIsEnabled & ~Qt::ItemIsDropEnabled);
+                newItem->setData(Qt::UserRole, (QVariant)QString("0"));
+                newItem->setBackground(Qt::gray);
+
+                this->m_pTableWidget->setItem(this->blackRowNum, j, newItem);
+            }
+            this->m_pTableWidget->resizeRowToContents(this->blackRowNum);
+
+            QStringList VTableHeader;
+            VTableHeader<<"  A "<<"  B "<<"  C "<<"  D "
+                                   <<""<<"  E "<<"  F "<<"  G "<<"  H "<<" "<<" "<<" ";
+
+            this->m_pTableWidget->setVerticalHeaderLabels(VTableHeader);
+            this->m_pTableWidget->setVTableHeader(VTableHeader);
+
         }
 
         file.close();

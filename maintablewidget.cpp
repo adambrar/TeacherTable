@@ -26,6 +26,7 @@ MainTableWidget::MainTableWidget(QWidget *parent) :
     this->hHeaderView = new HorizontalHeaderView(this);
     this->setHorizontalHeader( hHeaderView );
     this->blackoutColumns = 1;
+    this->blackRowNumber = 5;
     this->tableOptions = new MainTableOptions;
     this->movingItem = NULL;
 }
@@ -42,7 +43,8 @@ void MainTableWidget::mouseMoveEvent(QMouseEvent *event)
 {
     QTableWidgetItem *item = this->itemAt(event->pos());
 
-    if(item == 0 || this->visualColumn(item->column()) < this->blackoutColumns)
+    if(item == 0 || this->visualColumn(item->column()) < this->blackoutColumns
+            || item->row() == 4 || item != this->currentItem())
             return;
 
     this->movingItem = new QTableWidgetItem( *itemAt( event->pos() ));
@@ -58,7 +60,8 @@ void MainTableWidget::dropEvent(QDropEvent *event)
     this->hide();
     this->show();
 
-    if(item == 0 || this->visualColumn(item->column()) < this->blackoutColumns)
+    if(item == 0 || this->visualColumn(item->column()) < this->blackoutColumns
+            || item->row() == 4)
         return;
 
     emit classMoved(movingItem, toIndex.row(), toIndex.column(), \
@@ -146,7 +149,7 @@ void MainTableWidget::initTableWidget( QTableWidget *m_pTableWidget )
     m_HTableHeader.clear();
     m_HTableHeader<<" \n \n \nA\nD\nD\n \nT\nE\nA\nC\nH\nE\nR\n \n ";
     m_VTableHeader.clear();
-    m_VTableHeader<<"  A "<<"  B "<<"  C "<<"  D "<<"  E "<<"  F "<<"  G "<<"  H "<<" "<<" "<<" ";
+    m_VTableHeader<<"  A "<<"  B "<<"  C "<<"  D "<<""<<"  E "<<"  F "<<"  G "<<"  H "<<" "<<" "<<" ";
     m_pTableWidget->setHorizontalHeaderLabels(m_HTableHeader);
     m_pTableWidget->setVerticalHeaderLabels(m_VTableHeader);
     m_pTableWidget->horizontalHeader()->setSectionsClickable(true);
@@ -204,10 +207,12 @@ void MainTableWidget::insertInstructions( QTableWidget *m_pTableWidget )
     m_pTableWidget->item(1,addCol)->setText("create new\nclasses.\nClick");
     m_pTableWidget->item(2,addCol)->setText("Add Teacher\nto add\nteachers.");
     m_pTableWidget->item(3,addCol)->setText("Drag and\ndrop\ncells/columns");
-    m_pTableWidget->item(4,addCol)->setText("to reorder.\nRight\nclick to");
-    m_pTableWidget->item(5,addCol)->setText("access\noptions.\nClick");
-    m_pTableWidget->item(6,addCol)->setText("block\nheaders\nto get");
-    m_pTableWidget->item(7,addCol)->setText("grade\ntotals\nby row.");
+    m_pTableWidget->item(4,addCol)->setText("");
+    m_pTableWidget->resizeRowToContents(4);
+    m_pTableWidget->item(5,addCol)->setText("to reorder.\nRight\nclick to");
+    m_pTableWidget->item(6,addCol)->setText("access\noptions.\nClick");
+    m_pTableWidget->item(7,addCol)->setText("block\nheaders\nto get");
+    m_pTableWidget->item(8,addCol)->setText("grade\ntotals\nby row.");
 
     m_pTableWidget->resizeColumnToContents(addCol);
 
